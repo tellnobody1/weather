@@ -11,7 +11,7 @@ import java.net.URL;
 
 public class WeatherFetcher {
 
-    public static void fetchWeatherData(String urlString, OnWeatherDataReceivedListener listener) {
+    public static void fetch(String urlString, OnWeatherDataReceivedListener listener) {
         new Thread(() -> {
             try {
                 URL url = new URL(urlString);
@@ -33,12 +33,13 @@ public class WeatherFetcher {
                     WeatherData weatherData = JsonParser.parseWeatherData(response.toString());
 
                     // Notify the listener on the main thread
-                    new Handler(Looper.getMainLooper()).post(() -> listener.onReceived(weatherData));
+                    if (weatherData != null)
+                        new Handler(Looper.getMainLooper()).post(() -> listener.onReceived(weatherData));
                 } else {
                     throw new Exception("GET request not successful. Response code: " + responseCode);
                 }
             } catch (Exception e) {
-                Log.e(WeatherFetcher.class.getName(), "fetchWeatherData", e);
+                Log.e(WeatherFetcher.class.getSimpleName(), "fetchWeatherData", e);
             }
         }).start();
     }

@@ -1,40 +1,55 @@
 package io.github.tellnobody1.weather;
 
-import org.json.JSONArray;
+import android.util.Log;
+
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+
+import io.github.tellnobody1.weather.WeatherData.Current;
+import io.github.tellnobody1.weather.WeatherData.Day;
+import io.github.tellnobody1.weather.WeatherData.Day.Hour;
 
 public class JsonParser {
 
     public static WeatherData parseWeatherData(String json) {
+        var weatherData = (WeatherData) null;
         try {
-            JSONObject jsonObject = new JSONObject(json);
-            JSONArray weatherArray = jsonObject.getJSONArray("weather");
-            List<WeatherData.Day> days = new ArrayList<>();
+            var jsonObject = new JSONObject(json);
 
-            for (int i = 0; i < weatherArray.length(); i++) {
-                JSONObject dayObject = weatherArray.getJSONObject(i);
-                JSONArray hourlyArray = dayObject.getJSONArray("hourly");
-                List<WeatherData.Hour> hourlies = new ArrayList<>();
+            var currentConditions = jsonObject.getJSONArray("current_condition");
+            var current = (Current) null;
+            if (currentConditions.length() > 0) {
+                var currentCondition = currentConditions.getJSONObject(0);
+                var feelsLike = Integer.parseInt(currentCondition.getString("FeelsLikeC"));
+                var dateTime = currentCondition.getString("localObsDateTime");
+                var windSpeed = Integer.parseInt(currentCondition.getString("windspeedKmph"));
+                current = new Current(feelsLike, dateTime, windSpeed);
+            }
 
-                for (int j = 0; j < hourlyArray.length(); j++) {
-                    JSONObject hourObject = hourlyArray.getJSONObject(j);
+            var weatherArray = jsonObject.getJSONArray("weather");
+            var days = new ArrayList<Day>();
+
+            for (var i = 0; i < weatherArray.length(); i++) {
+                var dayObject = weatherArray.getJSONObject(i);
+                var hourlyArray = dayObject.getJSONArray("hourly");
+                var hourlies = new ArrayList<Hour>();
+
+                for (var j = 0; j < hourlyArray.length(); j++) {
+                    var hourObject = hourlyArray.getJSONObject(j);
                     var time = Integer.parseInt(hourObject.getString("time")) / 100;
                     var uvIndex = Integer.parseInt(hourObject.getString("uvIndex"));
-                    hourlies.add(new WeatherData.Hour(time, uvIndex));
+                    hourlies.add(new Hour(time, uvIndex));
                 }
 
-                WeatherData.Day day = new WeatherData.Day(hourlies);
+                Day day = new Day(hourlies);
                 days.add(day);
             }
 
-            return new WeatherData(days);
+            weatherData = new WeatherData(current, days);
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(JsonParser.class.getSimpleName(), "parseWeatherData", e);
         }
-        return new WeatherData(Collections.emptyList());
+        return weatherData;
     }
 }

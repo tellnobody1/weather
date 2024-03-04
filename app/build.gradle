@@ -16,10 +16,6 @@ android {
         targetSdk 34
         versionCode gitCommitsCount(rootDir)
         versionName gitDescribe(rootDir)
-
-        vectorDrawables {
-            useSupportLibrary true
-        }
     }
 
     applicationVariants.configureEach { variant ->
