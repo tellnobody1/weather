@@ -11,12 +11,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class SimpleLineChartView extends View {
+public class UVIndexChartView extends View {
     private final Paint paint = new Paint();
     private List<Integer> uvIndexList = new ArrayList<>();
-    private int maxUvIndex = 1; // Assuming the maximum UV index is 5 for demonstration
+    private int maxUvIndex = 1;
 
-    public SimpleLineChartView(Context context, AttributeSet attrs) {
+    public UVIndexChartView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 

@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.os.Bundle;
 
 import java.util.LinkedList;
-import java.util.List;
 
 public class MainActivity extends Activity {
     @Override
@@ -12,31 +11,22 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
 
-        WeatherFetcher.fetchWeatherData("https://wttr.in/Kyiv?format=j1", new WeatherFetcher.OnWeatherDataReceivedListener() {
-            @Override
-            public void onReceived(WeatherData weatherData) {
-                List<WeatherData.Day> weather = weatherData.getWeather();
-                for (int i = 0; i < weather.size(); i++) {
-                    var day = weather.get(i);
-                    var xs = new LinkedList<Integer>();
-                    for (var x : day.hourly()) {
-                        xs.add(x.getUvIndex());
-                    }
-                    if (i + 1 < weather.size()) {
-                        xs.add(weather.get(i + 1).hourly().get(weather.get(i + 1).hourly().size() - 1).getUvIndex());
-                    }
-                    runOnUiThread(() -> {
-                        SimpleLineChartView chartView = findViewById(R.id.simpleLineChartView);
-                        chartView.setUvIndexValues(xs);
-                        chartView.invalidate();
-                    });
-                    break;
+        WeatherFetcher.fetchWeatherData("https://wttr.in/Kyiv?format=j1", data -> {
+            var weather = data.days();
+            if (weather.size() > 0) {
+                var day = weather.get(0);
+                var xs = new LinkedList<Integer>();
+                for (var hour : day.hours())
+                    xs.add(hour.uvIndex());
+                if (weather.size() > 1) {
+                    var hourly = weather.get(1).hours();
+                    xs.add(hourly.get(hourly.size() - 1).uvIndex());
+                } else {
+                    xs.add(xs.get(xs.size() - 1));
                 }
-            }
-
-            @Override
-            public void onError(Exception e) {
-                e.printStackTrace();
+                UVIndexChartView chartView = findViewById(R.id.simpleLineChartView);
+                chartView.setUvIndexValues(xs);
+                chartView.invalidate();
             }
         });
     }

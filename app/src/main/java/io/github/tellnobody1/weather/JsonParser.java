@@ -18,13 +18,13 @@ public class JsonParser {
             for (int i = 0; i < weatherArray.length(); i++) {
                 JSONObject dayObject = weatherArray.getJSONObject(i);
                 JSONArray hourlyArray = dayObject.getJSONArray("hourly");
-                List<WeatherData.Hourly> hourlies = new ArrayList<>();
+                List<WeatherData.Hour> hourlies = new ArrayList<>();
 
                 for (int j = 0; j < hourlyArray.length(); j++) {
                     JSONObject hourObject = hourlyArray.getJSONObject(j);
-                    String time = hourObject.getString("time");
-                    String uvIndex = hourObject.getString("uvIndex");
-                    hourlies.add(new WeatherData.Hourly(time, uvIndex));
+                    var time = Integer.parseInt(hourObject.getString("time")) / 100;
+                    var uvIndex = Integer.parseInt(hourObject.getString("uvIndex"));
+                    hourlies.add(new WeatherData.Hour(time, uvIndex));
                 }
 
                 WeatherData.Day day = new WeatherData.Day(hourlies);

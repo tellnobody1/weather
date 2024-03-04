@@ -2,6 +2,7 @@ package io.github.tellnobody1.weather;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -37,17 +38,13 @@ public class WeatherFetcher {
                     throw new Exception("GET request not successful. Response code: " + responseCode);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
-                // Notify the listener about the error on the main thread
-                new Handler(Looper.getMainLooper()).post(() -> listener.onError(e));
+                Log.e(WeatherFetcher.class.getName(), "fetchWeatherData", e);
             }
         }).start();
     }
 
     public interface OnWeatherDataReceivedListener {
         void onReceived(WeatherData weatherData);
-
-        void onError(Exception e);
     }
 }
 
