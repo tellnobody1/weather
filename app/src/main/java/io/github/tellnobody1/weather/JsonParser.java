@@ -31,7 +31,7 @@ public class JsonParser {
                 for (var j = 0; j < hourlyArray.length(); j++) {
                     var hourObject = hourlyArray.getJSONObject(j);
                     var time = Integer.parseInt(hourObject.getString("time")) / 100;
-                    var uvIndex = Integer.parseInt(hourObject.getString("uvIndex"));
+                    var uvIndex = Integer.parseInt(hourObject.getString("uvIndex")) - 1;
                     hours.add(new Hour(time, uvIndex));
                 }
 

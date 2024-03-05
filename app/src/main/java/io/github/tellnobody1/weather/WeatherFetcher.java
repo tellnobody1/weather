@@ -44,4 +44,3 @@ public class WeatherFetcher {
         void onReceived(WeatherData weatherData);
     }
 }
-
