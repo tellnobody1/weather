@@ -23,23 +23,25 @@ public class MainActivity extends Activity {
         WeatherFetcher.fetch("https://wttr.in/Kyiv?format=j1", data -> {
             var current = data.current();
             this.<TextView>findViewById(R.id.dateTime).setText(current.dateTime());
-            this.<TextView>findViewById(R.id.feelsLike).setText(getString(R.string.feels_like, current.feelsLike()));
             this.<TextView>findViewById(R.id.windSpeed).setText(getString(R.string.wind_speed, current.windSpeed()));
 
             var days = data.days();
             if (!days.isEmpty()) {
-                var day = days.get(0);
+                var today = days.get(0);
 
-                this.<TextView>findViewById(R.id.sunset).setText(getString(R.string.sunset, day.sunset()));
+                this.<TextView>findViewById(R.id.feelsLike).setText(getString(R.string.feels_like, current.feelsLike(), today.minTemp(), today.maxTemp()));
+
+                this.<TextView>findViewById(R.id.sunset).setText(getString(R.string.sunset, today.sunset()));
 
                 var uvIndexes = new LinkedList<Integer>();
                 var uvTimes = new LinkedList<Integer>();
-                for (var hour : day.hours()) {
+                for (var hour : today.hours()) {
                     uvIndexes.add(hour.uvIndex());
                     uvTimes.add(hour.time());
                 }
                 if (days.size() > 1) {
-                    var hours = days.get(1).hours();
+                    var tomorrow = days.get(1);
+                    var hours = tomorrow.hours();
                     var noon = hours.get(hours.size() - 1);
                     uvIndexes.add(noon.uvIndex());
                     uvTimes.add(24);

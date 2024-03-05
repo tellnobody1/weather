@@ -25,6 +25,8 @@ public class JsonParser {
             for (var i = 0; i < weatherArray.length(); i++) {
                 var dayObject = weatherArray.getJSONObject(i);
                 var sunset = dayObject.getJSONArray("astronomy").getJSONObject(0).getString("sunset");
+                var minTemp = Integer.parseInt(dayObject.getString("mintempC"));
+                var maxTemp = Integer.parseInt(dayObject.getString("maxtempC"));
                 var hourlyArray = dayObject.getJSONArray("hourly");
                 var hours = new ArrayList<Hour>();
 
@@ -35,7 +37,7 @@ public class JsonParser {
                     hours.add(new Hour(time, uvIndex));
                 }
 
-                var day = new Day(sunset, hours);
+                var day = new Day(sunset, minTemp, maxTemp, hours);
                 days.add(day);
             }
 

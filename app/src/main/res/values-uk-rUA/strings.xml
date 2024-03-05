@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Погода</string>
-    <string name="feels_like">Відчувається як %d°</string>
+    <string name="feels_like">Відчувається як %d° (%d°–%d°)</string>
     <string name="wind_speed">Швидкість вітру %d км/год</string>
     <string name="uv_index">Ультрафіолетовий індекс</string>
     <string name="sunset">Захід сонця о %s</string>
