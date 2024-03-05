@@ -20,10 +20,26 @@ public class MainActivity extends Activity {
     private void fetchData(View v) { fetchData(); }
 
     private void fetchData() {
-        WeatherFetcher.fetch("https://wttr.in/Kyiv?format=j1", data -> {
+        WeatherFetcher.fetch("https://wttr.in/?format=j1", data -> {
             var current = data.current();
             this.<TextView>findViewById(R.id.dateTime).setText(current.dateTime());
-            this.<TextView>findViewById(R.id.windSpeed).setText(getString(R.string.wind_speed, current.windSpeed()));
+
+            int windScale;
+            var windSpeed = current.windSpeed();
+            if (windSpeed < 2) windScale = R.string.wind_0;
+            else if (windSpeed < 6) windScale = R.string.wind_1;
+            else if (windSpeed < 12) windScale = R.string.wind_2;
+            else if (windSpeed < 20) windScale = R.string.wind_3;
+            else if (windSpeed < 29) windScale = R.string.wind_4;
+            else if (windSpeed < 39) windScale = R.string.wind_5;
+            else if (windSpeed < 50) windScale = R.string.wind_6;
+            else if (windSpeed < 62) windScale = R.string.wind_7;
+            else if (windSpeed < 75) windScale = R.string.wind_8;
+            else if (windSpeed < 88) windScale = R.string.wind_9;
+            else if (windSpeed < 103) windScale = R.string.wind_10;
+            else if (windSpeed < 118) windScale = R.string.wind_11;
+            else windScale = R.string.wind_12;
+            this.<TextView>findViewById(R.id.windSpeed).setText(getString(R.string.wind, getString(windScale)));
 
             var days = data.days();
             if (!days.isEmpty()) {

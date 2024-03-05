@@ -2,7 +2,20 @@
 <resources>
     <string name="app_name">Погода</string>
     <string name="feels_like">Відчувається як %d° (%d°–%d°)</string>
-    <string name="wind_speed">Швидкість вітру %d км/год</string>
+    <string name="wind">Вітер: %s</string>
+    <string name="wind_0">Штиль</string>
+    <string name="wind_1">Легкий вітерець</string>
+    <string name="wind_2">Легкий бриз</string>
+    <string name="wind_3">М\'який бриз</string>
+    <string name="wind_4">Помірний бриз</string>
+    <string name="wind_5">Відчутний бриз</string>
+    <string name="wind_6">Сильний бриз</string>
+    <string name="wind_7">Сильний вітер</string>
+    <string name="wind_8">Шторм</string>
+    <string name="wind_9">Сильний шторм</string>
+    <string name="wind_10">Буря</string>
+    <string name="wind_11">Сильна буря</string>
+    <string name="wind_12">Сила урагану</string>
     <string name="uv_index">Ультрафіолетовий індекс</string>
     <string name="sunset">Захід сонця о %s</string>
     <string name="refresh">Оновити</string>
