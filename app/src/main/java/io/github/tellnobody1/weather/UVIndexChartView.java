@@ -25,33 +25,35 @@ public class UVIndexChartView extends View {
         if (uvIndexes == null || maxUvIndex == null || textColor == null)
             return;
 
-        int width = getWidth();
-        int height = getHeight();
-        int padding = 50;
-        int chartWidth = width - 2 * padding;
-        int chartHeight = height - 2 * padding;
         paint.setTextSize(textSize);
         paint.setColor(textColor);
+        paint.setTextAlign(CENTER);
         paint.setStrokeWidth(2);
+
+        var width = (float) getWidth();
+        var height = (float) getHeight();
+        var padding = paint.measureText("10");
+        var chartWidth = width - padding;
+        var chartHeight = height - padding;
 
         // Draw axes
         //   Y-axis
-        canvas.drawLine(padding, padding, padding, height - padding, paint);
+        canvas.drawLine(padding, 0, padding, height - padding, paint);
         //   X-axis
-        canvas.drawLine(padding, height - padding, width - padding, height - padding, paint);
+        canvas.drawLine(padding, height - padding, width, height - padding, paint);
 
         drawAxisValues(canvas, height, padding, chartWidth, chartHeight);
 
         // Draw title
-        drawCenteredText(getContext().getString(R.string.uv_index), (float) width / 2, padding, canvas);
+        drawTitle(width / 2, canvas);
 
         // Draw data points and lines
         if (!uvIndexes.isEmpty()) {
-            int prevX = padding;
-            int prevY = height - padding - uvIndexes.get(0) * chartHeight / maxUvIndex;
+            var prevX = padding;
+            var prevY = height - padding - uvIndexes.get(0) * chartHeight / maxUvIndex;
             for (int i = 1; i < uvIndexes.size(); i++) {
-                int x = padding + i * chartWidth / (uvIndexes.size() - 1);
-                int y = height - padding - uvIndexes.get(i) * chartHeight / maxUvIndex;
+                var x = padding + i * chartWidth / (uvIndexes.size() - 1);
+                var y = height - padding - uvIndexes.get(i) * chartHeight / maxUvIndex;
                 canvas.drawLine(prevX, prevY, x, y, paint);
                 prevX = x;
                 prevY = y;
@@ -59,41 +61,34 @@ public class UVIndexChartView extends View {
         }
     }
 
-    private void drawAxisValues(Canvas canvas, int height, int padding, int chartWidth, int chartHeight) {
+    private void drawAxisValues(Canvas canvas, float height, float padding, float chartWidth, float chartHeight) {
+        var fontMetrics = paint.getFontMetrics();
         // Y-axis values
-        for (int i = 0; i <= maxUvIndex; i++) {
-            String value = String.valueOf(i);
-            float y = height - padding - ((float) (i * chartHeight) / maxUvIndex);
-            canvas.drawText(value, padding - 40, y + 10, paint);
+        for (var i = 0; i < maxUvIndex; i++) {
+            var value = String.valueOf(i);
+            var y = height - padding - (i * chartHeight / maxUvIndex);
+            canvas.drawText(value, padding / 2, y + fontMetrics.descent, paint);
         }
-        // X-axis values (assuming 24 hours)
-        for (int i = 0; i <= 24; i += 3) {
-            String value = String.format("%02d", i);
-            float x = padding + ((float) (i * chartWidth) / 24);
-            canvas.drawText(value, x - 20, height - padding + 30, paint);
+        // X-axis values
+        var step = 3;
+        for (var i = step; i < 24; i += step) {
+            var value = String.format("%02d", i);
+            var x = padding + (i * chartWidth / 24);
+            canvas.drawText(value, x, height - padding - fontMetrics.ascent, paint);
         }
     }
 
-    public void init(List<Integer> uvIndexList, float textSize, int textColor) {
-        this.uvIndexes = uvIndexList;
-        this.maxUvIndex = Collections.max(uvIndexList) + 1;
+    public void init(List<Integer> uvIndexes, float textSize, int textColor) {
+        this.uvIndexes = uvIndexes;
+        this.maxUvIndex = Collections.max(uvIndexes) + 1;
         this.textSize = textSize;
         this.textColor = textColor;
         invalidate();
     }
 
-    private void drawCenteredText(String text, float centerX, float centerY, Canvas canvas) {
-        var textAlign = paint.getTextAlign();
-        paint.setTextAlign(CENTER);
-
-        // Calculate the vertical centering offset
-        Paint.FontMetrics fontMetrics = paint.getFontMetrics();
-        float textHeight = fontMetrics.descent - fontMetrics.ascent;
-        float baselineOffset = textHeight - fontMetrics.descent;
-
-        // Draw the text centered around (centerX, centerY)
-        canvas.drawText(text, centerX, centerY + baselineOffset, paint);
-
-        paint.setTextAlign(textAlign);
+    private void drawTitle(float centerX, Canvas canvas) {
+        var text = getContext().getString(R.string.uv_index);
+        var y = -paint.getFontMetrics().ascent + paint.getFontMetrics().leading;
+        canvas.drawText(text, centerX, y, paint);
     }
 }
