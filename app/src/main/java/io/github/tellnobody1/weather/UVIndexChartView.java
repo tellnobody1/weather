@@ -1,24 +1,18 @@
 package io.github.tellnobody1.weather;
 
+import android.content.Context;
+import android.graphics.*;
+import android.util.AttributeSet;
+import android.view.View;
+import java.util.*;
 import static android.graphics.Paint.ANTI_ALIAS_FLAG;
 import static android.graphics.Paint.Align.CENTER;
 
-import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.util.AttributeSet;
-import android.view.View;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 public class UVIndexChartView extends View {
     private final Paint paint = new Paint(ANTI_ALIAS_FLAG);
-    private List<Integer> uvIndexList = new ArrayList<>();
-    private int maxUvIndex = 1;
-    private Integer color;
+    private List<Integer> uvIndexes;
+    private Integer maxUvIndex;
+    private Integer textColor;
 
     public UVIndexChartView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -27,18 +21,22 @@ public class UVIndexChartView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        if (uvIndexes == null || maxUvIndex == null || textColor == null)
+            return;
 
         int width = getWidth();
         int height = getHeight();
         int padding = 50;
         int chartWidth = width - 2 * padding;
         int chartHeight = height - 2 * padding;
-        paint.setColor(color != null ? color : Color.GREEN);
+        paint.setColor(textColor);
         paint.setStrokeWidth(2);
 
         // Draw axes
-        canvas.drawLine(padding, padding, padding, height - padding, paint); // Y-axis
-        canvas.drawLine(padding, height - padding, width - padding, height - padding, paint); // X-axis
+        //   Y-axis
+        canvas.drawLine(padding, padding, padding, height - padding, paint);
+        //   X-axis
+        canvas.drawLine(padding, height - padding, width - padding, height - padding, paint);
 
         drawAxisValues(canvas, height, padding, chartWidth, chartHeight);
 
@@ -46,12 +44,12 @@ public class UVIndexChartView extends View {
         drawCenteredText(getContext().getString(R.string.uv_index), (float) width / 2, padding, canvas);
 
         // Draw data points and lines
-        if (!uvIndexList.isEmpty()) {
+        if (!uvIndexes.isEmpty()) {
             int prevX = padding;
-            int prevY = height - padding - uvIndexList.get(0) * chartHeight / maxUvIndex;
-            for (int i = 1; i < uvIndexList.size(); i++) {
-                int x = padding + i * chartWidth / (uvIndexList.size() - 1);
-                int y = height - padding - uvIndexList.get(i) * chartHeight / maxUvIndex;
+            int prevY = height - padding - uvIndexes.get(0) * chartHeight / maxUvIndex;
+            for (int i = 1; i < uvIndexes.size(); i++) {
+                int x = padding + i * chartWidth / (uvIndexes.size() - 1);
+                int y = height - padding - uvIndexes.get(i) * chartHeight / maxUvIndex;
                 canvas.drawLine(prevX, prevY, x, y, paint);
                 prevX = x;
                 prevY = y;
@@ -77,13 +75,11 @@ public class UVIndexChartView extends View {
         paint.setTextSize(textSize);
     }
 
-    public void setUvIndexValues(List<Integer> uvIndexList) {
-        this.uvIndexList = uvIndexList;
-        maxUvIndex = Collections.max(uvIndexList) + 1;
-    }
-
-    public void setTextColor(int color) {
-        this.color = color;
+    public void init(List<Integer> uvIndexList, int textColor) {
+        this.uvIndexes = uvIndexList;
+        this.maxUvIndex = Collections.max(uvIndexList) + 1;
+        this.textColor = textColor;
+        invalidate();
     }
 
     private void drawCenteredText(String text, float centerX, float centerY, Canvas canvas) {

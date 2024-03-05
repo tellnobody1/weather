@@ -3,4 +3,5 @@
     <string name="feels_like">Feels like %d°</string>
     <string name="wind_speed">Wind speed %d km/h</string>
     <string name="uv_index">Ultraviolet index</string>
+    <string name="sunset">Sunset at %s</string>
 </resources>

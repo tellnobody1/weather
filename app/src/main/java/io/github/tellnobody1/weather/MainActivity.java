@@ -3,7 +3,6 @@ package io.github.tellnobody1.weather;
 import android.app.Activity;
 import android.os.Bundle;
 import android.widget.TextView;
-
 import java.util.LinkedList;
 
 public class MainActivity extends Activity {
@@ -14,18 +13,16 @@ public class MainActivity extends Activity {
 
         WeatherFetcher.fetch("https://wttr.in/Kyiv?format=j1", data -> {
             var current = data.current();
-            if (current != null) {
-                var dateTimeView = this.<TextView>findViewById(R.id.dateTime);
-                dateTimeView.setText(current.dateTime());
-                var feelsLikeView = this.<TextView>findViewById(R.id.feelsLike);
-                feelsLikeView.setText(getString(R.string.feels_like, current.feelsLike()));
-                var windSpeedView = this.<TextView>findViewById(R.id.windSpeed);
-                windSpeedView.setText(getString(R.string.wind_speed, current.windSpeed()));
-            }
+            this.<TextView>findViewById(R.id.dateTime).setText(current.dateTime());
+            this.<TextView>findViewById(R.id.feelsLike).setText(getString(R.string.feels_like, current.feelsLike()));
+            this.<TextView>findViewById(R.id.windSpeed).setText(getString(R.string.wind_speed, current.windSpeed()));
 
             var days = data.days();
-            if (days.size() > 0) {
+            if (!days.isEmpty()) {
                 var day = days.get(0);
+
+                this.<TextView>findViewById(R.id.sunset).setText(getString(R.string.sunset, day.sunset()));
+
                 var uvIndexes = new LinkedList<Integer>();
                 for (var hour : day.hours())
                     uvIndexes.add(hour.uvIndex());
@@ -35,10 +32,7 @@ public class MainActivity extends Activity {
                 } else {
                     uvIndexes.add(uvIndexes.get(uvIndexes.size() - 1));
                 }
-                var uvIndexChartView = this.<UVIndexChartView>findViewById(R.id.uvIndexChart);
-                uvIndexChartView.setUvIndexValues(uvIndexes);
-                uvIndexChartView.setTextColor(this.<TextView>findViewById(R.id.dateTime).getCurrentTextColor());
-                uvIndexChartView.invalidate();
+                this.<UVIndexChartView>findViewById(R.id.uvIndexChart).init(uvIndexes, this.<TextView>findViewById(R.id.dateTime).getCurrentTextColor());
             }
         });
     }

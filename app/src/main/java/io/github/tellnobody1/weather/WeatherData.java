@@ -4,7 +4,7 @@ import java.util.List;
 
 public record WeatherData(Current current, List<Day> days) {
     public record Current(int feelsLike, String dateTime, int windSpeed) {}
-    public record Day(List<Hour> hours) {
+    public record Day(String sunset, List<Hour> hours) {
         public record Hour(int time, int uvIndex) {}
     }
 }
