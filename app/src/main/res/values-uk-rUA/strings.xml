@@ -5,4 +5,5 @@
     <string name="wind_speed">Швидкість вітру %d км/год</string>
     <string name="uv_index">Ультрафіолетовий індекс</string>
     <string name="sunset">Захід сонця о %s</string>
+    <string name="refresh">Оновити</string>
 </resources>

@@ -2,7 +2,8 @@ package io.github.tellnobody1.weather;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.widget.TextView;
+import android.view.View;
+import android.widget.*;
 import java.util.LinkedList;
 
 public class MainActivity extends Activity {
@@ -11,6 +12,14 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
 
+        this.<Button>findViewById(R.id.refresh).setOnClickListener(this::fetchData);
+
+        fetchData();
+    }
+
+    private void fetchData(View v) { fetchData(); }
+
+    private void fetchData() {
         WeatherFetcher.fetch("https://wttr.in/Kyiv?format=j1", data -> {
             var current = data.current();
             this.<TextView>findViewById(R.id.dateTime).setText(current.dateTime());
