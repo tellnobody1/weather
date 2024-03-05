@@ -108,7 +108,8 @@ public class UVIndexChartView extends View {
 
     private void drawTitle(float centerX, Canvas canvas) {
         var text = getContext().getString(R.string.uv_index);
-        var y = -paint.getFontMetrics().ascent + paint.getFontMetrics().leading;
+        var fontMetrics = paint.getFontMetrics();
+        var y = fontMetrics.descent - fontMetrics.ascent - (fontMetrics.bottom - fontMetrics.descent);
         canvas.drawText(text, centerX, y, paint);
     }
 }
