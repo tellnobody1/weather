@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.*;
-import java.util.LinkedList;
+import java.util.*;
 
 public class MainActivity extends Activity {
     @Override
@@ -33,17 +33,23 @@ public class MainActivity extends Activity {
                 this.<TextView>findViewById(R.id.sunset).setText(getString(R.string.sunset, day.sunset()));
 
                 var uvIndexes = new LinkedList<Integer>();
-                for (var hour : day.hours())
+                var uvTimes = new LinkedList<Integer>();
+                for (var hour : day.hours()) {
                     uvIndexes.add(hour.uvIndex());
+                    uvTimes.add(hour.time());
+                }
                 if (days.size() > 1) {
-                    var hourly = days.get(1).hours();
-                    uvIndexes.add(hourly.get(hourly.size() - 1).uvIndex());
+                    var hours = days.get(1).hours();
+                    var noon = hours.get(hours.size() - 1);
+                    uvIndexes.add(noon.uvIndex());
+                    uvTimes.add(24);
                 } else {
                     uvIndexes.add(uvIndexes.get(uvIndexes.size() - 1));
+                    uvTimes.add(24);
                 }
 
                 var textView = this.<TextView>findViewById(R.id.dateTime);
-                this.<UVIndexChartView>findViewById(R.id.uvIndexChart).init(uvIndexes, textView.getTextSize(), textView.getCurrentTextColor());
+                this.<UVIndexChartView>findViewById(R.id.uvIndexChart).init(uvIndexes, uvTimes, textView.getTextSize(), textView.getCurrentTextColor());
             }
         });
     }

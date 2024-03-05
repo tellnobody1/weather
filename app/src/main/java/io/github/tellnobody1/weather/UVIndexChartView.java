@@ -10,10 +10,12 @@ import static android.graphics.Paint.Align.CENTER;
 
 public class UVIndexChartView extends View {
     private final Paint paint = new Paint(ANTI_ALIAS_FLAG);
-    private List<Integer> uvIndexes;
+    private List<Integer> indexes;
+    private List<Integer> times;
     private Integer maxUvIndex;
     private Float textSize;
     private Integer textColor;
+    private boolean init = false;
 
     public UVIndexChartView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -22,7 +24,7 @@ public class UVIndexChartView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        if (uvIndexes == null || maxUvIndex == null || textColor == null)
+        if (!init)
             return;
 
         paint.setTextSize(textSize);
@@ -48,12 +50,12 @@ public class UVIndexChartView extends View {
         drawTitle(width / 2, canvas);
 
         // Draw data points and lines
-        if (!uvIndexes.isEmpty()) {
+        if (!indexes.isEmpty()) {
             var prevX = padding;
-            var prevY = height - padding - uvIndexes.get(0) * chartHeight / maxUvIndex;
-            for (int i = 1; i < uvIndexes.size(); i++) {
-                var x = padding + i * chartWidth / (uvIndexes.size() - 1);
-                var y = height - padding - uvIndexes.get(i) * chartHeight / maxUvIndex;
+            var prevY = height - padding - indexes.get(0) * chartHeight / maxUvIndex;
+            for (var i = 1; i < indexes.size(); i++) {
+                var x = padding + i * chartWidth / (indexes.size() - 1);
+                var y = height - padding - indexes.get(i) * chartHeight / maxUvIndex;
                 canvas.drawLine(prevX, prevY, x, y, paint);
                 prevX = x;
                 prevY = y;
@@ -70,19 +72,21 @@ public class UVIndexChartView extends View {
             canvas.drawText(value, padding / 2, y + fontMetrics.descent, paint);
         }
         // X-axis values
-        var step = 3;
-        for (var i = step; i < 24; i += step) {
-            var value = String.format("%02d", i);
-            var x = padding + (i * chartWidth / 24);
+        for (var t : times) {
+            if (t == 0 || t == 24) continue;
+            var value = String.format("%02d", t);
+            var x = padding + t * chartWidth / 24;
             canvas.drawText(value, x, height - padding - fontMetrics.ascent, paint);
         }
     }
 
-    public void init(List<Integer> uvIndexes, float textSize, int textColor) {
-        this.uvIndexes = uvIndexes;
-        this.maxUvIndex = Collections.max(uvIndexes) + 1;
+    public void init(List<Integer> indexes, List<Integer> times, float textSize, int textColor) {
+        this.indexes = indexes;
+        this.maxUvIndex = Collections.max(indexes) + 1;
+        this.times = times;
         this.textSize = textSize;
         this.textColor = textColor;
+        this.init = true;
         invalidate();
     }
 
