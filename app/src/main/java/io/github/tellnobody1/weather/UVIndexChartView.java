@@ -12,6 +12,7 @@ public class UVIndexChartView extends View {
     private final Paint paint = new Paint(ANTI_ALIAS_FLAG);
     private List<Integer> uvIndexes;
     private Integer maxUvIndex;
+    private Float textSize;
     private Integer textColor;
 
     public UVIndexChartView(Context context, AttributeSet attrs) {
@@ -29,6 +30,7 @@ public class UVIndexChartView extends View {
         int padding = 50;
         int chartWidth = width - 2 * padding;
         int chartHeight = height - 2 * padding;
+        paint.setTextSize(textSize);
         paint.setColor(textColor);
         paint.setStrokeWidth(2);
 
@@ -58,8 +60,6 @@ public class UVIndexChartView extends View {
     }
 
     private void drawAxisValues(Canvas canvas, int height, int padding, int chartWidth, int chartHeight) {
-        var textSize = paint.getTextSize();
-        paint.setTextSize(20);
         // Y-axis values
         for (int i = 0; i <= maxUvIndex; i++) {
             String value = String.valueOf(i);
@@ -72,21 +72,19 @@ public class UVIndexChartView extends View {
             float x = padding + ((float) (i * chartWidth) / 24);
             canvas.drawText(value, x - 20, height - padding + 30, paint);
         }
-        paint.setTextSize(textSize);
     }
 
-    public void init(List<Integer> uvIndexList, int textColor) {
+    public void init(List<Integer> uvIndexList, float textSize, int textColor) {
         this.uvIndexes = uvIndexList;
         this.maxUvIndex = Collections.max(uvIndexList) + 1;
+        this.textSize = textSize;
         this.textColor = textColor;
         invalidate();
     }
 
     private void drawCenteredText(String text, float centerX, float centerY, Canvas canvas) {
         var textAlign = paint.getTextAlign();
-        var textSize = paint.getTextSize();
         paint.setTextAlign(CENTER);
-        paint.setTextSize(30);
 
         // Calculate the vertical centering offset
         Paint.FontMetrics fontMetrics = paint.getFontMetrics();
@@ -97,6 +95,5 @@ public class UVIndexChartView extends View {
         canvas.drawText(text, centerX, centerY + baselineOffset, paint);
 
         paint.setTextAlign(textAlign);
-        paint.setTextSize(textSize);
     }
 }

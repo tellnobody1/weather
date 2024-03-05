@@ -41,7 +41,9 @@ public class MainActivity extends Activity {
                 } else {
                     uvIndexes.add(uvIndexes.get(uvIndexes.size() - 1));
                 }
-                this.<UVIndexChartView>findViewById(R.id.uvIndexChart).init(uvIndexes, this.<TextView>findViewById(R.id.dateTime).getCurrentTextColor());
+
+                var textView = this.<TextView>findViewById(R.id.dateTime);
+                this.<UVIndexChartView>findViewById(R.id.uvIndexChart).init(uvIndexes, textView.getTextSize(), textView.getCurrentTextColor());
             }
         });
     }
