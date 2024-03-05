@@ -12,9 +12,9 @@ public class UVIndexChartView extends View {
     private final Paint paint = new Paint(ANTI_ALIAS_FLAG);
     private List<Integer> indexes;
     private List<Integer> times;
-    private Integer maxUvIndex;
-    private Float textSize;
-    private Integer textColor;
+    private int maxUvIndex;
+    private float textSize;
+    private int textColor;
     private boolean init = false;
 
     public UVIndexChartView(Context context, AttributeSet attrs) {
@@ -46,7 +46,6 @@ public class UVIndexChartView extends View {
 
         drawAxisValues(canvas, height, padding, chartWidth, chartHeight);
 
-        // Draw title
         drawTitle(width / 2, canvas);
 
         // Draw data points and lines
@@ -54,9 +53,25 @@ public class UVIndexChartView extends View {
             var prevX = padding;
             var prevY = height - padding - indexes.get(0) * chartHeight / maxUvIndex;
             for (var i = 1; i < indexes.size(); i++) {
+                var index = indexes.get(i);
+                var prevIndex = indexes.get(i - 1);
                 var x = padding + i * chartWidth / (indexes.size() - 1);
-                var y = height - padding - indexes.get(i) * chartHeight / maxUvIndex;
-                canvas.drawLine(prevX, prevY, x, y, paint);
+                var y = height - padding - index * chartHeight / maxUvIndex;
+                if (prevIndex != 0 || index != 0) {
+                    var color = paint.getColor();
+                    var strokeWidth = paint.getStrokeWidth();
+                    paint.setStrokeWidth(width / 120);
+                    paint.setColor(switch (Math.max(prevIndex, index)) {
+                        case 0, 1, 2 -> Color.GREEN;
+                        case 3, 4, 5 -> Color.YELLOW;
+                        case 6, 7 -> Color.parseColor("#FFA500");
+                        case 8, 9, 10 -> Color.RED;
+                        default -> Color.parseColor("#8A2BE2");
+                    });
+                    canvas.drawLine(prevX, prevY, x, y, paint);
+                    paint.setColor(color);
+                    paint.setStrokeWidth(strokeWidth);
+                }
                 prevX = x;
                 prevY = y;
             }
@@ -81,6 +96,7 @@ public class UVIndexChartView extends View {
     }
 
     public void init(List<Integer> indexes, List<Integer> times, float textSize, int textColor) {
+        if (indexes.isEmpty()) return;
         this.indexes = indexes;
         this.maxUvIndex = Collections.max(indexes) + 1;
         this.times = times;
