@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.*;
-import java.util.*;
+import java.util.LinkedList;
 
 public class MainActivity extends Activity {
     @Override
@@ -45,7 +45,8 @@ public class MainActivity extends Activity {
             if (!days.isEmpty()) {
                 var today = days.get(0);
 
-                this.<TextView>findViewById(R.id.feelsLike).setText(getString(R.string.feels_like, current.feelsLike(), today.minTemp(), today.maxTemp()));
+                var minTemp = data.getMinTemp();
+                this.<TextView>findViewById(R.id.feelsLike).setText(getString(R.string.feels_like, current.feelsLike(), minTemp != null ? minTemp : today.maxTemp(), today.maxTemp()));
 
                 this.<TextView>findViewById(R.id.sunset).setText(getString(R.string.sunset, today.sunset()));
 

@@ -17,7 +17,7 @@ public class JsonParser {
             var feelsLike = Integer.parseInt(currentCondition.getString("FeelsLikeC"));
             var dateTime = currentCondition.getString("localObsDateTime");
             var windSpeed = Integer.parseInt(currentCondition.getString("windspeedKmph"));
-            var current = new Current(feelsLike, dateTime, windSpeed);
+            var current = new Current(dateTime, feelsLike, windSpeed);
 
             var weatherArray = jsonObject.getJSONArray("weather");
             var days = new ArrayList<Day>();
@@ -33,11 +33,12 @@ public class JsonParser {
                 for (var j = 0; j < hourlyArray.length(); j++) {
                     var hourObject = hourlyArray.getJSONObject(j);
                     var time = Integer.parseInt(hourObject.getString("time")) / 100;
+                    var temp = Integer.parseInt(hourObject.getString("tempC"));
                     var uvIndex = Integer.parseInt(hourObject.getString("uvIndex")) - 1;
-                    hours.add(new Hour(time, uvIndex));
+                    hours.add(new Hour(time, temp, uvIndex));
                 }
 
-                var day = new Day(sunset, minTemp, maxTemp, hours);
+                var day = new Day(sunset, maxTemp, hours);
                 days.add(day);
             }
 
