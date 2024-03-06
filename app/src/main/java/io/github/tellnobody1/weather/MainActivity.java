@@ -67,7 +67,7 @@ public class MainActivity extends Activity {
                 }
 
                 var textView = this.<TextView>findViewById(R.id.dateTime);
-                this.<UVIndexChartView>findViewById(R.id.uvIndexChart).init(uvIndexes, uvTimes, textView.getTextSize(), textView.getCurrentTextColor());
+                this.<UVChart>findViewById(R.id.uvChart).init(uvIndexes, uvTimes, textView.getTextSize(), textView.getCurrentTextColor());
             }
         });
     }

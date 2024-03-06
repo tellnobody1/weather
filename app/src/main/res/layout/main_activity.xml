@@ -33,8 +33,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
-            <io.github.tellnobody1.weather.UVIndexChartView
-                android:id="@+id/uvIndexChart"
+            <io.github.tellnobody1.weather.UVChart
+                android:id="@+id/uvChart"
                 android:layout_width="match_parent"
                 android:layout_height="200dp" />
 
