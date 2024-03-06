@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Weather</string>
-    <string name="feels_like">Feels like %d° (%d°–%d°)</string>
+    <string name="temperature">Feels like %d° (%d°–%d°)</string>
+    <string name="temperature_short">Feels like %d°</string>
     <string name="wind">Wind: %s</string>
     <string name="wind_0">Calm</string>
     <string name="wind_1">Light air</string>

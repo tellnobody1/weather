@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Погода</string>
-    <string name="feels_like">Відчувається як %d° (%d°–%d°)</string>
+    <string name="temperature">Відчувається як %d° (%d°–%d°)</string>
+    <string name="temperature_short">Відчувається як %d°</string>
     <string name="wind">Вітер: %s</string>
     <string name="wind_0">Штиль</string>
     <string name="wind_1">Легкий вітерець</string>

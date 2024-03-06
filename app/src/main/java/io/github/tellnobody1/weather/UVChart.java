@@ -4,7 +4,8 @@ import android.content.Context;
 import android.graphics.*;
 import android.util.AttributeSet;
 import android.view.View;
-import java.util.*;
+import io.github.tellnobody1.weather.WeatherData.UVData;
+import java.util.Collections;
 import static android.graphics.Paint.ANTI_ALIAS_FLAG;
 import static android.graphics.Paint.Align.CENTER;
 import static android.graphics.Paint.Join.ROUND;
@@ -27,8 +28,7 @@ public class UVChart extends View {
 
     private final Path path = new Path();
 
-    private List<Integer> indexes;
-    private List<Integer> times;
+    private UVData uvData;
     private int maxUvIndex;
     private boolean init = false;
 
@@ -48,9 +48,9 @@ public class UVChart extends View {
     }
 
     private void drawLine(Canvas canvas) {
-        final var color = paint.getColor();
-        final var strokeWidth = paint.getStrokeWidth();
-        final var style = paint.getStyle();
+        var color = paint.getColor();
+        var strokeWidth = paint.getStrokeWidth();
+        var style = paint.getStyle();
         paint.setStrokeWidth(width / 120);
         paint.setColor(switch (maxUvIndex - 1) {
             case 0, 1, 2 -> Color.GREEN;
@@ -61,14 +61,15 @@ public class UVChart extends View {
         });
         paint.setStyle(STROKE);
 
-        final var prevX = padding;
-        final var prevY = height - padding - indexes.get(0) * chartHeight / maxUvIndex;
-        path.moveTo(prevX, prevY);
-        for (var i = 1; i < indexes.size(); i++) {
-            var index = indexes.get(i);
-            var x = padding + i * chartWidth / (indexes.size() - 1);
-            var y = height - padding - index * chartHeight / maxUvIndex;
-            path.lineTo(x, y);
+        for (var i = 0; i < uvData.indexes().size(); i++) {
+            var index = uvData.indexes().get(i);
+            if (i == 0) {
+                path.moveTo(padding, height - padding - index * chartHeight / maxUvIndex);
+            } else {
+                var x = padding + i * chartWidth / (uvData.indexes().size() - 1);
+                var y = height - padding - index * chartHeight / maxUvIndex;
+                path.lineTo(x, y);
+            }
         }
         canvas.drawPath(path, paint);
 
@@ -91,7 +92,7 @@ public class UVChart extends View {
             canvas.drawText(value, padding / 2, y + fontMetrics.descent, paint);
         }
         // X-axis values
-        for (var t : times) {
+        for (var t : uvData.times()) {
             if (t == 0 || t == 24) continue;
             var value = String.format("%02d", t);
             var x = padding + t * chartWidth / 24;
@@ -106,13 +107,12 @@ public class UVChart extends View {
         canvas.drawText(getContext().getString(R.string.uv_index), x, y, paint);
     }
 
-    public void init(List<Integer> indexes, List<Integer> times, float textSize, int textColor) {
-        if (indexes.isEmpty()) {
-            init = false;
+    public void init(UVData uvData, float textSize, int textColor) {
+        if (uvData.indexes().isEmpty()) {
+            this.init = false;
         } else {
-            this.indexes = indexes;
-            this.maxUvIndex = Collections.max(indexes) + 1;
-            this.times = times;
+            this.uvData = uvData;
+            this.maxUvIndex = Collections.max(uvData.indexes()) + 1;
 
             paint.setTextSize(textSize);
             paint.setColor(textColor);
@@ -120,10 +120,10 @@ public class UVChart extends View {
             this.width = (float) getWidth();
             this.height = (float) getHeight();
             this.padding = paint.measureText("10");
-            this.chartWidth = width - padding;
-            this.chartHeight = height - padding;
+            this.chartWidth = this.width - this.padding;
+            this.chartHeight = this.height - this.padding;
 
-            init = true;
+            this.init = true;
             invalidate();
         }
     }
