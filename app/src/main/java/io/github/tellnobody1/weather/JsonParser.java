@@ -3,19 +3,23 @@ package io.github.tellnobody1.weather;
 import android.util.Log;
 import io.github.tellnobody1.weather.WeatherData.*;
 import io.github.tellnobody1.weather.WeatherData.Day.Hour;
-import java.util.ArrayList;
+import java.text.*;
+import java.util.*;
 import org.json.JSONObject;
+import static java.text.DateFormat.SHORT;
+import static java.util.Locale.US;
 
 public class JsonParser {
 
-    public static WeatherData parseWeatherData(String json) {
+    public static WeatherData parseWeatherData(String json, Locale locale) {
         var weatherData = (WeatherData) null;
         try {
             var jsonObject = new JSONObject(json);
+            var timeFormat = DateFormat.getTimeInstance(SHORT, locale);
 
             var currentCondition = jsonObject.getJSONArray("current_condition").getJSONObject(0);
             var feelsLike = Integer.parseInt(currentCondition.getString("FeelsLikeC"));
-            var dateTime = currentCondition.getString("localObsDateTime");
+            var dateTime = timeFormat.format(new SimpleDateFormat("yyyy-MM-dd hh:mm a", Locale.US).parse(currentCondition.getString("localObsDateTime")));
             var windSpeed = Integer.parseInt(currentCondition.getString("windspeedKmph"));
             var current = new Current(dateTime, feelsLike, windSpeed);
 
@@ -24,8 +28,7 @@ public class JsonParser {
 
             for (var i = 0; i < weatherArray.length(); i++) {
                 var dayObject = weatherArray.getJSONObject(i);
-                var sunset = dayObject.getJSONArray("astronomy").getJSONObject(0).getString("sunset");
-                var minTemp = Integer.parseInt(dayObject.getString("mintempC"));
+                var sunset = timeFormat.format(DateFormat.getTimeInstance(SHORT, US).parse(dayObject.getJSONArray("astronomy").getJSONObject(0).getString("sunset")));
                 var maxTemp = Integer.parseInt(dayObject.getString("maxtempC"));
                 var hourlyArray = dayObject.getJSONArray("hourly");
                 var hours = new ArrayList<Hour>();

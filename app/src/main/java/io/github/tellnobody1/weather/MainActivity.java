@@ -19,7 +19,8 @@ public class MainActivity extends Activity {
     private void fetchData(View v) { fetchData(); }
 
     private void fetchData() {
-        WeatherFetcher.fetch("https://wttr.in/?format=j1", this::updateUI);
+        var locale = getResources().getConfiguration().locale;
+        WeatherFetcher.fetch("https://wttr.in/?format=j1", locale, this::updateUI);
     }
 
     private void updateUI(WeatherData data) {
@@ -31,7 +32,7 @@ public class MainActivity extends Activity {
     }
 
     private void setTime(WeatherData data) {
-        this.<TextView>findViewById(R.id.dateTime).setText(data.current().dateTime());
+        this.<TextView>findViewById(R.id.dateTime).setText(getString(R.string.observation_time, data.current().dateTime()));
     }
 
     private void setWindForce(WeatherData data) {
