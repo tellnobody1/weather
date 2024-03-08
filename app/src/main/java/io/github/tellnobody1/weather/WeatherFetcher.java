@@ -4,11 +4,11 @@ import android.os.*;
 import android.util.Log;
 import java.io.*;
 import java.net.*;
-import java.util.Locale;
+import java.text.DateFormat;
 
 public class WeatherFetcher {
 
-    public static void fetch(String urlString, Locale locale, OnWeatherDataReceivedListener listener) {
+    public static void fetch(String urlString, DateFormat timeFormat, OnWeatherDataReceivedListener listener) {
         new Thread(() -> {
             try {
                 URL url = new URL(urlString);
@@ -27,7 +27,7 @@ public class WeatherFetcher {
                     in.close();
 
                     // Parse the response
-                    WeatherData weatherData = JsonParser.parseWeatherData(response.toString(), locale);
+                    WeatherData weatherData = JsonParser.parseWeatherData(response.toString(), timeFormat);
 
                     // Notify the listener on the main thread
                     if (weatherData != null)

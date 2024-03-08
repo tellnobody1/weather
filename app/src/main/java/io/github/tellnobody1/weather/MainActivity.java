@@ -4,7 +4,10 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.*;
+import java.text.DateFormat;
+import java.util.Calendar;
 import static android.view.View.*;
+import static java.text.DateFormat.SHORT;
 
 public class MainActivity extends Activity {
     @Override
@@ -16,47 +19,55 @@ public class MainActivity extends Activity {
         fetchData();
     }
 
+    private DateFormat timeFormat() {
+        var locale = getResources().getConfiguration().locale;
+        return DateFormat.getTimeInstance(SHORT, locale);
+    }
+
+    private int nowHours() {
+        return Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+    }
+
+    private String nowTime() {
+        return timeFormat().format(Calendar.getInstance().getTime());
+    }
+
     private void fetchData(View v) { fetchData(); }
 
     private void fetchData() {
-        var locale = getResources().getConfiguration().locale;
-        WeatherFetcher.fetch("https://wttr.in/?format=j1", locale, this::updateUI);
+        WeatherFetcher.fetch("https://wttr.in/?format=j1", timeFormat(), this::updateUI);
     }
 
     private void updateUI(WeatherData data) {
-        setTime(data);
-        setWindForce(data);
-        setTemperature(data);
+        setTime();
+        setTodayWeather(data);
         setSunset(data);
         setUVChart(data);
     }
 
-    private void setTime(WeatherData data) {
-        this.<TextView>findViewById(R.id.dateTime).setText(getString(R.string.observation_time, data.current().dateTime()));
+    private void setTime() {
+        this.<TextView>findViewById(R.id.dateTime).setText(getString(R.string.updated_time, nowTime()));
     }
 
-    private void setWindForce(WeatherData data) {
-        this.<TextView>findViewById(R.id.windForce).setText(getString(
-                R.string.wind,
-                getString(data.getWindForce())
-        ));
-    }
-
-    private void setTemperature(WeatherData data) {
+    private void setTodayWeather(WeatherData data) {
+        var todayWeather = data.todayWeather(nowHours());
+        // temperature (now, min, max)
         TextView temperature = findViewById(R.id.temperature);
-        var minTemp = data.getMinTemp();
-        if (minTemp == null || data.days().isEmpty()) {
+        temperature.setVisibility(todayWeather == null ? GONE : VISIBLE);
+        if (todayWeather != null)
             temperature.setText(getString(
-                    R.string.temperature_short,
-                    data.current().feelsLike()
+                R.string.temperature,
+                todayWeather.feelsNow(),
+                todayWeather.feelsMin(),
+                todayWeather.feelsMax()
             ));
-        } else {
-            var today = data.days().get(0);
-            temperature.setText(getString(
-                    R.string.temperature,
-                    data.current().feelsLike(),
-                    minTemp,
-                    today.maxTemp()
+        // wind force
+        TextView windForce = findViewById(R.id.windForce);
+        windForce.setVisibility(todayWeather == null ? GONE : VISIBLE);
+        if (todayWeather != null) {
+            windForce.setText(getString(
+                    R.string.wind,
+                    getString(todayWeather.windForce())
             ));
         }
     }
@@ -74,6 +85,6 @@ public class MainActivity extends Activity {
         TextView textView = findViewById(R.id.dateTime);
         var textSize = textView.getTextSize();
         var textColor = textView.getCurrentTextColor();
-        this.<UVChart>findViewById(R.id.uvChart).init(data.getUVData(), textSize, textColor);
+        this.<UVChart>findViewById(R.id.uvChart).init(data.uvData(), textSize, textColor);
     }
 }
