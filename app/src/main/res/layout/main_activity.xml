@@ -9,8 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/refresh"
-        android:layout_marginHorizontal="@dimen/layout_margin"
-        android:layout_marginTop="@dimen/layout_margin">
+        android:layout_marginHorizontal="@dimen/layout_margin">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -29,6 +28,11 @@
                 android:layout_height="wrap_content" />
             <TextView
                 android:id="@+id/windForce"
+                android:textSize="@dimen/body_font_size"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/windGustForce"
                 android:textSize="@dimen/body_font_size"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />

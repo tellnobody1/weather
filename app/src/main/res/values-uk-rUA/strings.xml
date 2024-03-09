@@ -9,6 +9,7 @@
     <string name="hour_3">більше 3-x годин тому</string>
     <string name="temperature">Відчувається як %d° (%d°–%d°)</string>
     <string name="wind">Вітер: %s</string>
+    <string name="wind_gust">Пориви: %s</string>
     <string name="wind_0">Штиль</string>
     <string name="wind_1">Легкий вітерець</string>
     <string name="wind_2">Легкий бриз</string>

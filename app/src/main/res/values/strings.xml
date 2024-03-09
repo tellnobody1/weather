@@ -8,6 +8,7 @@
     <string name="hour_3">more than 3 hours ago</string>
     <string name="temperature">Feels like %d° (%d°–%d°)</string>
     <string name="wind">Wind: %s</string>
+    <string name="wind_gust">Gust: %s</string>
     <string name="wind_0">Calm</string>
     <string name="wind_1">Light air</string>
     <string name="wind_2">Light breeze</string>

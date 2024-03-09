@@ -84,12 +84,25 @@ public class MainActivity extends Activity {
             ));
         // wind force
         TextView windForce = findViewById(R.id.windForce);
-        windForce.setVisibility(todayWeather == null ? GONE : VISIBLE);
+        TextView windGustForce = findViewById(R.id.windGustForce);
         if (todayWeather != null) {
+            windForce.setVisibility(VISIBLE);
             windForce.setText(getString(
                     R.string.wind,
                     getString(todayWeather.windForce())
             ));
+            if (todayWeather.windGustForce() != todayWeather.windForce()) {
+                windGustForce.setVisibility(VISIBLE);
+                windGustForce.setText(getString(
+                        R.string.wind_gust,
+                        getString(todayWeather.windGustForce())
+                ));
+            } else {
+                windGustForce.setVisibility(GONE);
+            }
+        } else {
+            windForce.setVisibility(GONE);
+            windGustForce.setVisibility(GONE);
         }
     }
 

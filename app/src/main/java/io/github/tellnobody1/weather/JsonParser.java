@@ -31,7 +31,8 @@ public class JsonParser {
                     var feels = Integer.parseInt(hourObject.getString("FeelsLikeC"));
                     var uvIndex = Integer.parseInt(hourObject.getString("uvIndex")) - 1;
                     var windSpeed = Integer.parseInt(hourObject.getString("windspeedKmph"));
-                    hours.add(new Hour(time, feels, uvIndex, windSpeed));
+                    var windGustSpeed = Integer.parseInt(hourObject.getString("WindGustKmph"));
+                    hours.add(new Hour(time, feels, uvIndex, windSpeed, windGustSpeed));
                 }
 
                 var day = new Day(sunset, hours);
