@@ -25,7 +25,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        updateUI(data);
+        if (data != null) updateUI(data);
     }
 
     private DateFormat timeFormat() {
@@ -98,6 +98,6 @@ public class MainActivity extends Activity {
         TextView textView = findViewById(R.id.dateTime);
         var textSize = textView.getTextSize();
         var textColor = textView.getCurrentTextColor();
-        this.<UVChart>findViewById(R.id.uvChart).init(data.uvData(), textSize, textColor);
+        this.<UVChart>findViewById(R.id.uvChart).init(data.uvData(), textSize, textColor, now());
     }
 }

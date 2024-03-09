@@ -5,11 +5,12 @@ import android.graphics.*;
 import android.util.AttributeSet;
 import android.view.View;
 import io.github.tellnobody1.weather.WeatherData.UVData;
-import java.util.Collections;
+import java.util.*;
 import static android.graphics.Paint.ANTI_ALIAS_FLAG;
 import static android.graphics.Paint.Align.CENTER;
 import static android.graphics.Paint.Join.ROUND;
 import static android.graphics.Paint.Style.STROKE;
+import static java.util.Calendar.*;
 
 public class UVChart extends View {
     public static final int ORANGE = Color.parseColor("#FFA500");
@@ -31,6 +32,7 @@ public class UVChart extends View {
     private UVData uvData;
     private int maxUvIndex;
     private boolean init = false;
+    private Calendar now;
 
     public UVChart(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -40,6 +42,7 @@ public class UVChart extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         if (init) {
+            drawNow(canvas);
             drawAxes(canvas);
             drawAxesValues(canvas);
             drawTitle(canvas);
@@ -78,6 +81,22 @@ public class UVChart extends View {
         paint.setStyle(style);
     }
 
+    private void drawNow(Canvas canvas) {
+        var effect = paint.getPathEffect();
+        var alpha = paint.getAlpha();
+        var interval = padding / 5;
+        paint.setPathEffect(new DashPathEffect(new float[]{interval, interval}, 0));
+        paint.setAlpha(128);
+
+        var t = (now.get(HOUR_OF_DAY) * 60 + now.get(MINUTE)) / ((float) 24 * 60);
+        var x = padding + t * chartWidth;
+        var y = chartHeight / maxUvIndex;
+        canvas.drawLine(x, y, x, height - padding, paint);
+
+        paint.setPathEffect(effect);
+        paint.setAlpha(alpha);
+    }
+
     private void drawAxes(Canvas canvas) {
         canvas.drawLine(padding, padding / 2, padding, height - padding, paint); // Y-axis
         canvas.drawLine(padding, height - padding, width, height - padding, paint); // X-axis
@@ -107,12 +126,13 @@ public class UVChart extends View {
         canvas.drawText(getContext().getString(R.string.uv_index), x, y, paint);
     }
 
-    public void init(UVData uvData, float textSize, int textColor) {
+    public void init(UVData uvData, float textSize, int textColor, Calendar now) {
         if (uvData.indexes().isEmpty()) {
             this.init = false;
         } else {
             this.uvData = uvData;
             this.maxUvIndex = Collections.max(uvData.indexes()) + 1;
+            this.now = now;
 
             paint.setTextSize(textSize);
             paint.setColor(textColor);
