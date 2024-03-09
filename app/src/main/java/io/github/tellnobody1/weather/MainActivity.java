@@ -25,7 +25,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (data != null) updateUI(data);
+        if (data != null) updateUI(data, false);
     }
 
     private DateFormat timeFormat() {
@@ -40,26 +40,34 @@ public class MainActivity extends Activity {
     private void fetchData(View v) { fetchData(); }
 
     private void fetchData() {
-        WeatherFetcher.fetch("https://wttr.in/?format=j1", timeFormat(), now(), this::updateUI);
+        WeatherFetcher.fetch("https://wttr.in/Київ?format=j1", timeFormat(), now(), data -> updateUI(data, true));
     }
 
-    private void updateUI(WeatherData data) {
+    private void updateUI(WeatherData data, boolean now) {
         this.data = data;
-        setTime(data);
+        setTime(data, now);
         setTodayWeather(data);
         setSunset(data);
         setUVChart(data);
     }
 
-    private void setTime(WeatherData data) {
-        var hours = (now().getTimeInMillis() - data.dateTime().getTimeInMillis()) / (3600 * 1000);
+    private void setTime(WeatherData data, boolean now) {
         TextView dateTime = findViewById(R.id.dateTime);
-        dateTime.setText(getString(R.string.updated, getString(switch ((int) hours) {
-            case 0 -> R.string.now;
-            case 1 -> R.string.one_hour;
-            case 2 -> R.string.two_hours;
-            default -> R.string.three_hours;
-        })));
+        dateTime.setText(getString(R.string.updated, getString(now ?
+            R.string.now :
+            switch (hoursBeforeNow(data)) {
+                case 0 -> R.string.hour_0;
+                case 1 -> R.string.hour_1;
+                case 2 -> R.string.hour_2;
+                default -> R.string.hour_3;
+            }
+        )));
+    }
+
+    private int hoursBeforeNow(WeatherData data) {
+        var msDiff = now().getTimeInMillis() - data.dateTime().getTimeInMillis();
+        var msInDay = 3600 * 1000;
+        return (int) ((float) msDiff / msInDay);
     }
 
     private void setTodayWeather(WeatherData data) {

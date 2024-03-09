@@ -3,9 +3,10 @@
     <string name="app_name">Погода</string>
     <string name="updated">Оновлено %s</string>
     <string name="now">зараз</string>
-    <string name="one_hour">годину тому</string>
-    <string name="two_hours">дві години тому</string>
-    <string name="three_hours">більше 3-x годин тому</string>
+    <string name="hour_0">менше години тому</string>
+    <string name="hour_1">годину тому</string>
+    <string name="hour_2">дві години тому</string>
+    <string name="hour_3">більше 3-x годин тому</string>
     <string name="temperature">Відчувається як %d° (%d°–%d°)</string>
     <string name="wind">Вітер: %s</string>
     <string name="wind_0">Штиль</string>
