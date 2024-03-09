@@ -64,6 +64,7 @@ public class UVChart extends View {
         });
         paint.setStyle(STROKE);
 
+        path.reset();
         for (var i = 0; i < uvData.indexes().size(); i++) {
             var index = uvData.indexes().get(i);
             if (i == 0) {
