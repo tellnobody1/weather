@@ -8,8 +8,11 @@ import java.text.DateFormat;
 import java.util.Calendar;
 import static android.view.View.*;
 import static java.text.DateFormat.SHORT;
+import static java.util.Calendar.HOUR_OF_DAY;
 
 public class MainActivity extends Activity {
+    private WeatherData data;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -19,38 +22,48 @@ public class MainActivity extends Activity {
         fetchData();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateUI(data);
+    }
+
     private DateFormat timeFormat() {
         var locale = getResources().getConfiguration().locale;
         return DateFormat.getTimeInstance(SHORT, locale);
     }
 
-    private int nowHours() {
-        return Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
-    }
-
-    private String nowTime() {
-        return timeFormat().format(Calendar.getInstance().getTime());
+    private Calendar now() {
+        return Calendar.getInstance();
     }
 
     private void fetchData(View v) { fetchData(); }
 
     private void fetchData() {
-        WeatherFetcher.fetch("https://wttr.in/?format=j1", timeFormat(), this::updateUI);
+        WeatherFetcher.fetch("https://wttr.in/?format=j1", timeFormat(), now(), this::updateUI);
     }
 
     private void updateUI(WeatherData data) {
-        setTime();
+        this.data = data;
+        setTime(data);
         setTodayWeather(data);
         setSunset(data);
         setUVChart(data);
     }
 
-    private void setTime() {
-        this.<TextView>findViewById(R.id.dateTime).setText(getString(R.string.updated_time, nowTime()));
+    private void setTime(WeatherData data) {
+        var hours = (now().getTimeInMillis() - data.dateTime().getTimeInMillis()) / (3600 * 1000);
+        TextView dateTime = findViewById(R.id.dateTime);
+        dateTime.setText(getString(R.string.updated, getString(switch ((int) hours) {
+            case 0 -> R.string.now;
+            case 1 -> R.string.one_hour;
+            case 2 -> R.string.two_hours;
+            default -> R.string.three_hours;
+        })));
     }
 
     private void setTodayWeather(WeatherData data) {
-        var todayWeather = data.todayWeather(nowHours());
+        var todayWeather = data.todayWeather(now().get(HOUR_OF_DAY));
         // temperature (now, min, max)
         TextView temperature = findViewById(R.id.temperature);
         temperature.setVisibility(todayWeather == null ? GONE : VISIBLE);

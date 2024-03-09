@@ -4,19 +4,17 @@ import android.util.Log;
 import io.github.tellnobody1.weather.WeatherData.Day;
 import io.github.tellnobody1.weather.WeatherData.Day.Hour;
 import java.text.DateFormat;
-import java.util.ArrayList;
+import java.util.*;
 import org.json.JSONObject;
 import static java.text.DateFormat.SHORT;
 import static java.util.Locale.US;
 
 public class JsonParser {
 
-    public static WeatherData parseWeatherData(String json, DateFormat timeFormat) {
+    public static WeatherData parseWeatherData(String json, DateFormat timeFormat, Calendar now) {
         var weatherData = (WeatherData) null;
         try {
             var jsonObject = new JSONObject(json);
-
-            var currentCondition = jsonObject.getJSONArray("current_condition").getJSONObject(0);
 
             var weatherArray = jsonObject.getJSONArray("weather");
             var days = new ArrayList<Day>();
@@ -40,7 +38,7 @@ public class JsonParser {
                 days.add(day);
             }
 
-            weatherData = new WeatherData(days);
+            weatherData = new WeatherData(now, days);
         } catch (Exception e) {
             Log.e(JsonParser.class.getSimpleName(), "parseWeatherData", e);
         }

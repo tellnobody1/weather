@@ -1,6 +1,10 @@
 <resources>
     <string name="app_name">Weather</string>
-    <string name="updated_time">Updated on %s</string>
+    <string name="updated">Updated %s</string>
+    <string name="now">just now</string>
+    <string name="one_hour">hour ago</string>
+    <string name="two_hours">two hours ago</string>
+    <string name="three_hours">more than 3 hours ago</string>
     <string name="temperature">Feels like %d° (%d°–%d°)</string>
     <string name="wind">Wind: %s</string>
     <string name="wind_0">Calm</string>

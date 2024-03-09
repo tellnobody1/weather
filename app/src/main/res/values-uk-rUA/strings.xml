@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Погода</string>
-    <string name="updated_time">Оновлено о %s</string>
+    <string name="updated">Оновлено %s</string>
+    <string name="now">зараз</string>
+    <string name="one_hour">годину тому</string>
+    <string name="two_hours">дві години тому</string>
+    <string name="three_hours">більше 3-x годин тому</string>
     <string name="temperature">Відчувається як %d° (%d°–%d°)</string>
     <string name="wind">Вітер: %s</string>
     <string name="wind_0">Штиль</string>

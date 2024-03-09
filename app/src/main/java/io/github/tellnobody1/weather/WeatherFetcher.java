@@ -5,10 +5,11 @@ import android.util.Log;
 import java.io.*;
 import java.net.*;
 import java.text.DateFormat;
+import java.util.Calendar;
 
 public class WeatherFetcher {
 
-    public static void fetch(String urlString, DateFormat timeFormat, OnWeatherDataReceivedListener listener) {
+    public static void fetch(String urlString, DateFormat timeFormat, Calendar now, OnWeatherDataReceivedListener listener) {
         new Thread(() -> {
             try {
                 URL url = new URL(urlString);
@@ -27,7 +28,7 @@ public class WeatherFetcher {
                     in.close();
 
                     // Parse the response
-                    WeatherData weatherData = JsonParser.parseWeatherData(response.toString(), timeFormat);
+                    WeatherData weatherData = JsonParser.parseWeatherData(response.toString(), timeFormat, now);
 
                     // Notify the listener on the main thread
                     if (weatherData != null)
