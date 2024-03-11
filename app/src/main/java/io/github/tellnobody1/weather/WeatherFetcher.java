@@ -6,17 +6,21 @@ import java.io.*;
 import java.net.*;
 import java.text.DateFormat;
 import java.util.Calendar;
+import javax.net.ssl.SSLHandshakeException;
+import static java.net.URLEncoder.encode;
 
 public class WeatherFetcher {
 
-    public static void fetch(String urlString, DateFormat timeFormat, Calendar now, OnWeatherDataReceivedListener listener) {
+    public static void fetch(String city, DateFormat timeFormat, Calendar now, Consumer<WeatherData> onReceived, Consumer<Void> onCertError) {
         new Thread(() -> {
             try {
-                URL url = new URL(urlString);
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                var encodedCity = encode(city, "utf8");
+                var urlString = "https://wttr.in/" + encodedCity + "?format=j1";
+                var url = new URL(urlString);
+                var connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
 
-                int responseCode = connection.getResponseCode();
+                var responseCode = connection.getResponseCode();
                 if (responseCode == HttpURLConnection.HTTP_OK) {
                     BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
                     StringBuilder response = new StringBuilder();
@@ -28,21 +32,24 @@ public class WeatherFetcher {
                     in.close();
 
                     // Parse the response
-                    WeatherData weatherData = JsonParser.parseWeatherData(response.toString(), timeFormat, now);
+                    var weatherData = JsonParser.parseWeatherData(response.toString(), timeFormat, now);
 
                     // Notify the listener on the main thread
                     if (weatherData != null)
-                        new Handler(Looper.getMainLooper()).post(() -> listener.onReceived(weatherData));
+                        new Handler(Looper.getMainLooper()).post(() -> onReceived.accept(weatherData));
                 } else {
                     throw new Exception("GET request not successful. Response code: " + responseCode);
                 }
+            } catch (SSLHandshakeException e) {
+                Log.d(WeatherFetcher.class.getSimpleName(), "fetchWeatherData", e);
+                new Handler(Looper.getMainLooper()).post(() -> onCertError.accept(null));
             } catch (Exception e) {
                 Log.e(WeatherFetcher.class.getSimpleName(), "fetchWeatherData", e);
             }
         }).start();
     }
 
-    public interface OnWeatherDataReceivedListener {
-        void onReceived(WeatherData weatherData);
+    public interface Consumer<T> {
+        void accept(T t);
     }
 }

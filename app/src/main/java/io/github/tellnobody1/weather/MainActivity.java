@@ -40,7 +40,13 @@ public class MainActivity extends Activity {
     private void fetchData(View v) { fetchData(); }
 
     private void fetchData() {
-        WeatherFetcher.fetch("https://wttr.in/Київ?format=j1", timeFormat(), now(), data -> updateUI(data, true));
+        WeatherFetcher.fetch(
+            "Київ",
+            timeFormat(),
+            now(),
+            data -> updateUI(data, true),
+            x -> Toast.makeText(this, "Outdated certificates", Toast.LENGTH_SHORT).show()
+        );
     }
 
     private void updateUI(WeatherData data, boolean now) {
