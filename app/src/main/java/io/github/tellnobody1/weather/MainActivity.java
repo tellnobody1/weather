@@ -2,10 +2,12 @@ package io.github.tellnobody1.weather;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.view.View;
+import android.view.*;
 import android.widget.*;
 import java.text.DateFormat;
 import java.util.Calendar;
+import static android.os.Build.VERSION.SDK_INT;
+import static android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH;
 import static android.view.View.*;
 import static java.text.DateFormat.SHORT;
 import static java.util.Calendar.HOUR_OF_DAY;
@@ -18,8 +20,29 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
 
-        this.<Button>findViewById(R.id.refresh).setOnClickListener(this::fetchData);
         fetchData();
+
+        if (SDK_INT >= ICE_CREAM_SANDWICH)
+            if (!ViewConfiguration.get(this).hasPermanentMenuKey()) {
+                Button btn = findViewById(R.id.refresh);
+                btn.setVisibility(VISIBLE);
+                btn.setOnClickListener(this::fetchData);
+            }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_refresh) {
+            fetchData();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
