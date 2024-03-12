@@ -3,10 +3,9 @@ package io.github.tellnobody1.weather;
 import android.util.Log;
 import io.github.tellnobody1.weather.WeatherData.Day;
 import io.github.tellnobody1.weather.WeatherData.Day.Hour;
-import java.text.DateFormat;
+import java.text.*;
 import java.util.*;
 import org.json.JSONObject;
-import static java.text.DateFormat.SHORT;
 import static java.util.Locale.US;
 
 public class JsonParser {
@@ -21,7 +20,7 @@ public class JsonParser {
 
             for (var i = 0; i < weatherArray.length(); i++) {
                 var dayObject = weatherArray.getJSONObject(i);
-                var sunset = timeFormat.format(DateFormat.getTimeInstance(SHORT, US).parse(dayObject.getJSONArray("astronomy").getJSONObject(0).getString("sunset")));
+                var sunset = timeFormat.format(new SimpleDateFormat("hh:mm a", US).parse(dayObject.getJSONArray("astronomy").getJSONObject(0).getString("sunset")));
                 var hourlyArray = dayObject.getJSONArray("hourly");
                 var hours = new ArrayList<Hour>();
 
