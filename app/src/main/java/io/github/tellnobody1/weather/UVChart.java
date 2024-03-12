@@ -6,6 +6,7 @@ import android.util.AttributeSet;
 import android.view.View;
 import io.github.tellnobody1.weather.WeatherData.UVData;
 import java.util.*;
+import static android.graphics.Color.*;
 import static android.graphics.Paint.ANTI_ALIAS_FLAG;
 import static android.graphics.Paint.Align.CENTER;
 import static android.graphics.Paint.Join.ROUND;
@@ -56,10 +57,10 @@ public class UVChart extends View {
         var style = paint.getStyle();
         paint.setStrokeWidth(width / 120);
         paint.setColor(switch (maxUvIndex - 1) {
-            case 0, 1, 2 -> Color.GREEN;
-            case 3, 4, 5 -> Color.YELLOW;
+            case 0, 1, 2 -> GREEN;
+            case 3, 4, 5 -> YELLOW;
             case 6, 7 -> ORANGE;
-            case 8, 9, 10 -> Color.RED;
+            case 8, 9, 10 -> RED;
             default -> VIOLET;
         });
         paint.setStyle(STROKE);

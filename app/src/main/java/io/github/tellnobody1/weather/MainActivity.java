@@ -8,6 +8,7 @@ import java.text.DateFormat;
 import java.util.Calendar;
 import static android.os.Build.VERSION.SDK_INT;
 import static android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH;
+import static android.os.Build.VERSION_CODES.N;
 import static android.view.View.*;
 import static java.text.DateFormat.SHORT;
 import static java.util.Calendar.HOUR_OF_DAY;
@@ -52,7 +53,8 @@ public class MainActivity extends Activity {
     }
 
     private DateFormat timeFormat() {
-        var locale = getResources().getConfiguration().locale;
+        var conf = getResources().getConfiguration();
+        var locale = SDK_INT >= N ? conf.getLocales().get(0) : conf.locale;
         return DateFormat.getTimeInstance(SHORT, locale);
     }
 

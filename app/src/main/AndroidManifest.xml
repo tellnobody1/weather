@@ -1,16 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
-
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.INTERNET" />
-
     <application
-        android:allowBackup="false"
         android:icon="@android:color/transparent"
         android:label="@string/app_name"
         android:roundIcon="@android:color/transparent"
-        android:theme="@style/Theme.Weather"
-        tools:targetApi="31">
+        android:theme="@style/Theme.Weather">
         <activity
             android:name=".MainActivity"
             android:exported="true">
