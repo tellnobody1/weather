@@ -20,8 +20,10 @@ android {
 
     applicationVariants.configureEach { variant ->
         variant.outputs.configureEach {
-            var variantName = variant.name.endsWith('Debug') ? '-debug' : ''
-            outputFileName = "${rootProject.name}-${variant.versionName}${variantName}.apk"
+            if (variant.name.endsWith('Debug'))
+                outputFileName = "${rootProject.name.toLowerCase()}_debug.apk"
+            else
+                outputFileName = "${rootProject.name.toLowerCase()}.apk"
         }
     }
 

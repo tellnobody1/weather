@@ -3,7 +3,7 @@
     <string name="app_name">Погода</string>
     <string name="updated">Оновлено %s</string>
     <string name="now">зараз</string>
-    <string name="hour_0">менше години тому</string>
+    <string name="hour_0">нещодавно</string>
     <string name="hour_1">годину тому</string>
     <string name="hour_2">дві години тому</string>
     <string name="hour_3">більше 3-x годин тому</string>
@@ -26,4 +26,6 @@
     <string name="uv_index">Ультрафіолетовий індекс</string>
     <string name="sunset">Захід сонця о %s</string>
     <string name="refresh">Оновити</string>
+    <string name="outdated_certificates">Сертіфікати застаріли</string>
+    <string name="no_internet">Немає інтернету</string>
 </resources>

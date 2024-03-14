@@ -2,7 +2,7 @@
     <string name="app_name">Weather</string>
     <string name="updated">Updated %s</string>
     <string name="now">just now</string>
-    <string name="hour_0">less than hour ago</string>
+    <string name="hour_0">recently</string>
     <string name="hour_1">one hour ago</string>
     <string name="hour_2">two hours ago</string>
     <string name="hour_3">more than 3 hours ago</string>
@@ -25,4 +25,6 @@
     <string name="uv_index">Ultraviolet index</string>
     <string name="sunset">Sunset at %s</string>
     <string name="refresh">Refresh</string>
+    <string name="outdated_certificates">Outdated certificates</string>
+    <string name="no_internet">No internet</string>
 </resources>

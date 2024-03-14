@@ -38,7 +38,7 @@ public class JsonParser {
                 days.add(day);
             }
 
-            weatherData = new WeatherData(now, days);
+            weatherData = new WeatherData(now, days, json);
         } catch (Exception e) {
             Log.d(JsonParser.class.getSimpleName(), "JSON=" + json);
             Log.e(JsonParser.class.getSimpleName(), "parseWeatherData", e);

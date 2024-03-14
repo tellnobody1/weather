@@ -22,11 +22,11 @@ public class UVChart extends View {
         setStrokeWidth(2);
         setStrokeJoin(ROUND);
     }};
-    private float width;
-    private float height;
+    private float width() { return (float) getWidth(); }
+    private float height() { return (float) getHeight(); }
     private float padding;
-    private float chartWidth;
-    private float chartHeight;
+    private float chartWidth() { return width() - padding; }
+    private float chartHeight() { return height() - padding; }
 
     private final Path path = new Path();
 
@@ -55,7 +55,7 @@ public class UVChart extends View {
         var color = paint.getColor();
         var strokeWidth = paint.getStrokeWidth();
         var style = paint.getStyle();
-        paint.setStrokeWidth(width / 120);
+        paint.setStrokeWidth(width() / 120);
         paint.setColor(switch (maxUvIndex - 1) {
             case 0, 1, 2 -> GREEN;
             case 3, 4, 5 -> YELLOW;
@@ -69,10 +69,10 @@ public class UVChart extends View {
         for (var i = 0; i < uvData.indexes().size(); i++) {
             var index = uvData.indexes().get(i);
             if (i == 0) {
-                path.moveTo(padding, height - padding - index * chartHeight / maxUvIndex);
+                path.moveTo(padding, chartHeight() - index * chartHeight() / maxUvIndex);
             } else {
-                var x = padding + i * chartWidth / (uvData.indexes().size() - 1);
-                var y = height - padding - index * chartHeight / maxUvIndex;
+                var x = padding + i * chartWidth() / (uvData.indexes().size() - 1);
+                var y = chartHeight() - index * chartHeight() / maxUvIndex;
                 path.lineTo(x, y);
             }
         }
@@ -91,17 +91,17 @@ public class UVChart extends View {
         paint.setAlpha(128);
 
         var t = (now.get(HOUR_OF_DAY) * 60 + now.get(MINUTE)) / ((float) 24 * 60);
-        var x = padding + t * chartWidth;
-        var y = chartHeight / maxUvIndex;
-        canvas.drawLine(x, y, x, height - padding, paint);
+        var x = padding + t * chartWidth();
+        var y = chartHeight() / maxUvIndex;
+        canvas.drawLine(x, y, x, chartHeight(), paint);
 
         paint.setPathEffect(effect);
         paint.setAlpha(alpha);
     }
 
     private void drawAxes(Canvas canvas) {
-        canvas.drawLine(padding, padding / 2, padding, height - padding, paint); // Y-axis
-        canvas.drawLine(padding, height - padding, width, height - padding, paint); // X-axis
+        canvas.drawLine(padding, padding / 2, padding, chartHeight(), paint); // Y-axis
+        canvas.drawLine(padding, chartHeight(), width(), chartHeight(), paint); // X-axis
     }
 
     private void drawAxesValues(Canvas canvas) {
@@ -109,22 +109,22 @@ public class UVChart extends View {
         // Y-axis values
         for (var i = 0; i < maxUvIndex; i++) {
             var value = String.valueOf(i);
-            var y = height - padding - (i * chartHeight / maxUvIndex);
+            var y = chartHeight() - (i * chartHeight() / maxUvIndex);
             canvas.drawText(value, padding / 2, y + fontMetrics.descent, paint);
         }
         // X-axis values
         for (var t : uvData.times()) {
             if (t == 0 || t == 24) continue;
             var value = String.format("%02d", t);
-            var x = padding + t * chartWidth / 24;
-            canvas.drawText(value, x, height - padding - fontMetrics.ascent, paint);
+            var x = padding + t * chartWidth() / 24;
+            canvas.drawText(value, x, chartHeight() - fontMetrics.ascent, paint);
         }
     }
 
     private void drawTitle(Canvas canvas) {
         var fontMetrics = paint.getFontMetrics();
         var y = fontMetrics.descent - fontMetrics.ascent - (fontMetrics.bottom - fontMetrics.descent);
-        var x = width / 2;
+        var x = width() / 2;
         canvas.drawText(getContext().getString(R.string.uv_index), x, y, paint);
     }
 
@@ -139,11 +139,7 @@ public class UVChart extends View {
             paint.setTextSize(textSize);
             paint.setColor(textColor);
 
-            this.width = (float) getWidth();
-            this.height = (float) getHeight();
             this.padding = paint.measureText("10");
-            this.chartWidth = this.width - this.padding;
-            this.chartHeight = this.height - this.padding;
 
             this.init = true;
             invalidate();

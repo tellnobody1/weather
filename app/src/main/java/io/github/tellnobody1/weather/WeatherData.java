@@ -5,7 +5,7 @@ import static java.lang.Integer.max;
 import static java.util.Collections.max;
 import static java.util.Collections.min;
 
-public record WeatherData(Calendar dateTime, List<Day> days) {
+public record WeatherData(Calendar dateTime, List<Day> days, String json) {
 
     public record Day(String sunset, List<Hour> hours) {
         record Hour(int time, int feels, int uvIndex, int windSpeed, int windGustSpeed) {}

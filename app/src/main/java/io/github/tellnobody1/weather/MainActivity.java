@@ -1,27 +1,36 @@
 package io.github.tellnobody1.weather;
 
 import android.app.Activity;
-import android.os.Bundle;
+import android.net.ConnectivityManager;
+import android.os.*;
 import android.view.*;
 import android.widget.*;
 import java.text.DateFormat;
 import java.util.Calendar;
+import static android.net.ConnectivityManager.RESTRICT_BACKGROUND_STATUS_DISABLED;
 import static android.os.Build.VERSION.SDK_INT;
 import static android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH;
 import static android.os.Build.VERSION_CODES.N;
 import static android.view.View.*;
+import static android.widget.Toast.LENGTH_SHORT;
 import static java.text.DateFormat.SHORT;
 import static java.util.Calendar.HOUR_OF_DAY;
 
 public class MainActivity extends Activity {
     private WeatherData data;
+    private final DataPrefs dataPrefs = new DataPrefs(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
 
-        fetchData();
+        var json = dataPrefs.load();
+        if (json != null)
+            data = JsonParser.parseWeatherData(json, timeFormat(), now());
+
+        if (shouldFetch())
+            fetchData();
 
         if (SDK_INT >= ICE_CREAM_SANDWICH)
             if (!ViewConfiguration.get(this).hasPermanentMenuKey()) {
@@ -49,7 +58,35 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+        // consider current time for data display
         if (data != null) updateUI(data, false);
+    }
+
+    private boolean shouldFetch() {
+        var connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        if (connectivityManager == null)
+            return false;
+        // internet is enabled
+        var activeNetwork = connectivityManager.getActiveNetworkInfo();
+        if (activeNetwork == null || !activeNetwork.isConnectedOrConnecting())
+            return false;
+        // background data saver is disabled
+        if (SDK_INT >= N)
+            if (connectivityManager.getRestrictBackgroundStatus() != RESTRICT_BACKGROUND_STATUS_DISABLED)
+                return false;
+        // is not on cellular
+        if (activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE)
+            return false;
+        return true;
+    }
+
+    private boolean internetEnabled() {
+        var connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        if (connectivityManager != null) {
+            var activeNetwork = connectivityManager.getActiveNetworkInfo();
+            return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+        }
+        return false;
     }
 
     private DateFormat timeFormat() {
@@ -65,13 +102,19 @@ public class MainActivity extends Activity {
     private void fetchData(View v) { fetchData(); }
 
     private void fetchData() {
-        WeatherFetcher.fetch(
-            "Київ",
-            timeFormat(),
-            now(),
-            data -> updateUI(data, true),
-            x -> Toast.makeText(this, "Outdated certificates", Toast.LENGTH_SHORT).show()
-        );
+        if (internetEnabled())
+            WeatherFetcher.fetch(
+                "Київ",
+                timeFormat(),
+                now(),
+                data -> {
+                    updateUI(data, true);
+                    dataPrefs.save(data.json());
+                },
+                x -> Toast.makeText(this, R.string.outdated_certificates, LENGTH_SHORT).show()
+            );
+        else
+            Toast.makeText(this, R.string.no_internet, LENGTH_SHORT).show();
     }
 
     private void updateUI(WeatherData data, boolean now) {
