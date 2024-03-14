@@ -2,23 +2,20 @@ package io.github.tellnobody1.weather;
 
 import android.app.Activity;
 import android.net.ConnectivityManager;
-import android.os.*;
+import android.os.Bundle;
 import android.view.*;
 import android.widget.*;
-import java.text.DateFormat;
-import java.util.Calendar;
-import static android.net.ConnectivityManager.RESTRICT_BACKGROUND_STATUS_DISABLED;
 import static android.os.Build.VERSION.SDK_INT;
 import static android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH;
-import static android.os.Build.VERSION_CODES.N;
 import static android.view.View.*;
 import static android.widget.Toast.LENGTH_SHORT;
-import static java.text.DateFormat.SHORT;
-import static java.util.Calendar.HOUR_OF_DAY;
 
 public class MainActivity extends Activity {
     private WeatherData data;
     private final DataPrefs dataPrefs = new DataPrefs(this);
+    private final WeatherFetcher weatherFetcher = new WeatherFetcher();
+    private final NetworkOps networkOps = new NetworkOps(this);
+    private final TimeOps timeOps = new TimeOps(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,7 +24,7 @@ public class MainActivity extends Activity {
 
         var json = dataPrefs.load();
         if (json != null)
-            data = JsonParser.parseWeatherData(json, timeFormat(), now());
+            data = JsonParser.parseWeatherData(json, timeOps.timeFormat(), timeOps.now());
 
         if (shouldFetch())
             fetchData();
@@ -62,56 +59,42 @@ public class MainActivity extends Activity {
         if (data != null) updateUI(data, false);
     }
 
+    @Override
+    protected void onDestroy() {
+        dataPrefs.close();
+        weatherFetcher.close();
+        super.onDestroy();
+    }
+
     private boolean shouldFetch() {
         var connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
         if (connectivityManager == null)
             return false;
-        // internet is enabled
-        var activeNetwork = connectivityManager.getActiveNetworkInfo();
-        if (activeNetwork == null || !activeNetwork.isConnectedOrConnecting())
+        if (networkOps.internetDisabled(connectivityManager))
             return false;
-        // background data saver is disabled
-        if (SDK_INT >= N)
-            if (connectivityManager.getRestrictBackgroundStatus() != RESTRICT_BACKGROUND_STATUS_DISABLED)
-                return false;
-        // is not on cellular
-        if (activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE)
+        if (networkOps.dataSaver(connectivityManager))
+            return false;
+        if (networkOps.cellular(connectivityManager))
             return false;
         return true;
-    }
-
-    private boolean internetEnabled() {
-        var connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
-        if (connectivityManager != null) {
-            var activeNetwork = connectivityManager.getActiveNetworkInfo();
-            return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
-        }
-        return false;
-    }
-
-    private DateFormat timeFormat() {
-        var conf = getResources().getConfiguration();
-        var locale = SDK_INT >= N ? conf.getLocales().get(0) : conf.locale;
-        return DateFormat.getTimeInstance(SHORT, locale);
-    }
-
-    private Calendar now() {
-        return Calendar.getInstance();
     }
 
     private void fetchData(View v) { fetchData(); }
 
     private void fetchData() {
-        if (internetEnabled())
-            WeatherFetcher.fetch(
+        if (networkOps.internetEnabled())
+            weatherFetcher.fetch(
                 "Київ",
-                timeFormat(),
-                now(),
+                timeOps.timeFormat(),
+                timeOps.now(),
                 data -> {
                     updateUI(data, true);
                     dataPrefs.save(data.json());
                 },
-                x -> Toast.makeText(this, R.string.outdated_certificates, LENGTH_SHORT).show()
+                (id, msg) -> {
+                    if (id != null) Toast.makeText(this, id, LENGTH_SHORT).show();
+                    else if (msg != null) Toast.makeText(this, msg, LENGTH_SHORT).show();
+                }
             );
         else
             Toast.makeText(this, R.string.no_internet, LENGTH_SHORT).show();
@@ -129,7 +112,7 @@ public class MainActivity extends Activity {
         TextView dateTime = findViewById(R.id.dateTime);
         dateTime.setText(getString(R.string.updated, getString(now ?
             R.string.now :
-            switch (hoursBeforeNow(data)) {
+            switch (timeOps.hoursBeforeNow(data.dateTime())) {
                 case 0 -> R.string.hour_0;
                 case 1 -> R.string.hour_1;
                 case 2 -> R.string.hour_2;
@@ -138,14 +121,8 @@ public class MainActivity extends Activity {
         )));
     }
 
-    private int hoursBeforeNow(WeatherData data) {
-        var msDiff = now().getTimeInMillis() - data.dateTime().getTimeInMillis();
-        var msInDay = 3600 * 1000;
-        return (int) ((float) msDiff / msInDay);
-    }
-
     private void setTodayWeather(WeatherData data) {
-        var todayWeather = data.todayWeather(now().get(HOUR_OF_DAY));
+        var todayWeather = data.todayWeather(timeOps.hourOfNow());
         // temperature (now, min, max)
         TextView temperature = findViewById(R.id.temperature);
         temperature.setVisibility(todayWeather == null ? GONE : VISIBLE);
@@ -193,6 +170,6 @@ public class MainActivity extends Activity {
         TextView textView = findViewById(R.id.dateTime);
         var textSize = textView.getTextSize();
         var textColor = textView.getCurrentTextColor();
-        this.<UVChart>findViewById(R.id.uvChart).init(data.uvData(), textSize, textColor, now());
+        this.<UVChart>findViewById(R.id.uvChart).init(data.uvData(), textSize, textColor, timeOps.timeProgress());
     }
 }

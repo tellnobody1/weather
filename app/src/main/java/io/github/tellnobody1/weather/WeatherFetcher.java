@@ -6,13 +6,21 @@ import java.io.*;
 import java.net.*;
 import java.text.DateFormat;
 import java.util.Calendar;
+import java.util.concurrent.*;
 import javax.net.ssl.SSLHandshakeException;
 import static java.net.URLEncoder.encode;
 
 public class WeatherFetcher {
+    private final ExecutorService exec = Executors.newSingleThreadExecutor();
 
-    public static void fetch(String city, DateFormat timeFormat, Calendar now, Consumer<WeatherData> onReceived, Consumer<Void> onCertError) {
-        new Thread(() -> {
+    public void fetch(
+            String city,
+            DateFormat timeFormat,
+            Calendar now,
+            Consumer onReceived,
+            ConsumerErr onError
+    ) {
+        exec.execute(() -> {
             try {
                 var encodedCity = encode(city, "utf8");
                 var urlString = "https://wttr.in/" + encodedCity + "?format=j1";
@@ -22,8 +30,8 @@ public class WeatherFetcher {
 
                 var responseCode = connection.getResponseCode();
                 if (responseCode == HttpURLConnection.HTTP_OK) {
-                    BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                    StringBuilder response = new StringBuilder();
+                    var in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                    var response = new StringBuilder();
                     String line;
 
                     while ((line = in.readLine()) != null) {
@@ -42,14 +50,23 @@ public class WeatherFetcher {
                 }
             } catch (SSLHandshakeException e) {
                 Log.d(WeatherFetcher.class.getSimpleName(), "fetchWeatherData", e);
-                new Handler(Looper.getMainLooper()).post(() -> onCertError.accept(null));
+                new Handler(Looper.getMainLooper()).post(() -> onError.accept(R.string.outdated_certificates, null));
             } catch (Exception e) {
                 Log.e(WeatherFetcher.class.getSimpleName(), "fetchWeatherData", e);
+                new Handler(Looper.getMainLooper()).post(() -> onError.accept(null, e.getLocalizedMessage()));
             }
-        }).start();
+        });
     }
 
-    public interface Consumer<T> {
-        void accept(T t);
+    public void close() {
+        exec.shutdownNow();
+    }
+
+    public interface Consumer {
+        void accept(WeatherData data);
+    }
+
+    public interface ConsumerErr {
+        void accept(Integer code, String msg);
     }
 }

@@ -5,13 +5,12 @@ import android.graphics.*;
 import android.util.AttributeSet;
 import android.view.View;
 import io.github.tellnobody1.weather.WeatherData.UVData;
-import java.util.*;
+import java.util.Collections;
 import static android.graphics.Color.*;
 import static android.graphics.Paint.ANTI_ALIAS_FLAG;
 import static android.graphics.Paint.Align.CENTER;
 import static android.graphics.Paint.Join.ROUND;
 import static android.graphics.Paint.Style.STROKE;
-import static java.util.Calendar.*;
 
 public class UVChart extends View {
     public static final int ORANGE = Color.parseColor("#FFA500");
@@ -22,6 +21,7 @@ public class UVChart extends View {
         setStrokeWidth(2);
         setStrokeJoin(ROUND);
     }};
+
     private float width() { return (float) getWidth(); }
     private float height() { return (float) getHeight(); }
     private float padding;
@@ -33,7 +33,7 @@ public class UVChart extends View {
     private UVData uvData;
     private int maxUvIndex;
     private boolean init = false;
-    private Calendar now;
+    private float timeProgress;
 
     public UVChart(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -90,8 +90,7 @@ public class UVChart extends View {
         paint.setPathEffect(new DashPathEffect(new float[]{interval, interval}, 0));
         paint.setAlpha(128);
 
-        var t = (now.get(HOUR_OF_DAY) * 60 + now.get(MINUTE)) / ((float) 24 * 60);
-        var x = padding + t * chartWidth();
+        var x = padding + timeProgress * chartWidth();
         var y = chartHeight() / maxUvIndex;
         canvas.drawLine(x, y, x, chartHeight(), paint);
 
@@ -128,13 +127,13 @@ public class UVChart extends View {
         canvas.drawText(getContext().getString(R.string.uv_index), x, y, paint);
     }
 
-    public void init(UVData uvData, float textSize, int textColor, Calendar now) {
+    public void init(UVData uvData, float textSize, int textColor, float timeProgress) {
         if (uvData.indexes().isEmpty()) {
             this.init = false;
         } else {
             this.uvData = uvData;
             this.maxUvIndex = Collections.max(uvData.indexes()) + 1;
-            this.now = now;
+            this.timeProgress = timeProgress;
 
             paint.setTextSize(textSize);
             paint.setColor(textColor);
