@@ -12,6 +12,7 @@ import static android.widget.Toast.LENGTH_SHORT;
 
 public class MainActivity extends Activity {
     private WeatherData data;
+    private String location = null;
     private final DataPrefs dataPrefs = new DataPrefs(this);
     private final WeatherFetcher weatherFetcher = new WeatherFetcher();
     private final NetworkOps networkOps = new NetworkOps(this);
@@ -31,9 +32,14 @@ public class MainActivity extends Activity {
 
         if (SDK_INT >= ICE_CREAM_SANDWICH)
             if (!ViewConfiguration.get(this).hasPermanentMenuKey()) {
-                Button btn = findViewById(R.id.refresh);
-                btn.setVisibility(VISIBLE);
-                btn.setOnClickListener(this::fetchData);
+                var menu = findViewById(R.id.menu);
+                menu.setVisibility(VISIBLE);
+
+                Button refresh = findViewById(R.id.refresh);
+                refresh.setOnClickListener(this::fetchData);
+
+                Button location = findViewById(R.id.location);
+                location.setOnClickListener(this::location);
             }
     }
 
@@ -45,11 +51,16 @@ public class MainActivity extends Activity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_refresh) {
+        var itemId = item.getItemId();
+        if (itemId == R.id.action_refresh) {
             fetchData();
             return true;
+        } else if (itemId == R.id.action_location) {
+            location(null);
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -81,10 +92,17 @@ public class MainActivity extends Activity {
 
     private void fetchData(View v) { fetchData(); }
 
+    private void location(View v) {
+        new LocationDialog(this, data.areaName(), (location) -> {
+            this.location = location;
+            fetchData();
+        }).show();
+    }
+
     private void fetchData() {
         if (networkOps.internetEnabled())
             weatherFetcher.fetch(
-                "Київ",
+                location,
                 timeOps.timeFormat(),
                 timeOps.now(),
                 data -> {

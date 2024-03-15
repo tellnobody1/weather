@@ -25,6 +25,9 @@
     <string name="uv_index">Ultraviolet index</string>
     <string name="sunset">Sunset at %s</string>
     <string name="refresh">Refresh</string>
+    <string name="location">Location</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
     <string name="outdated_certificates">Outdated certificates</string>
     <string name="no_internet">No internet</string>
 </resources>

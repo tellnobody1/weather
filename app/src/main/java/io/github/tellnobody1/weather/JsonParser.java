@@ -15,6 +15,8 @@ public class JsonParser {
         try {
             var jsonObject = new JSONObject(json);
 
+            var areaName = jsonObject.getJSONArray("nearest_area").getJSONObject(0).getJSONArray("areaName").getJSONObject(0).getString("value");
+
             var weatherArray = jsonObject.getJSONArray("weather");
             var days = new ArrayList<Day>();
 
@@ -38,7 +40,7 @@ public class JsonParser {
                 days.add(day);
             }
 
-            weatherData = new WeatherData(now, days, json);
+            weatherData = new WeatherData(now, days, areaName, json);
         } catch (Exception e) {
             Log.d(JsonParser.class.getSimpleName(), "JSON=" + json);
             Log.e(JsonParser.class.getSimpleName(), "parseWeatherData", e);

@@ -26,6 +26,9 @@
     <string name="uv_index">Ультрафіолетовий індекс</string>
     <string name="sunset">Захід сонця о %s</string>
     <string name="refresh">Оновити</string>
+    <string name="location">Розташування</string>
+    <string name="ok">Гаразд</string>
+    <string name="cancel">Скасувати</string>
     <string name="outdated_certificates">Сертіфікати застаріли</string>
     <string name="no_internet">Немає інтернету</string>
 </resources>

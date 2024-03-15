@@ -14,7 +14,7 @@ public class WeatherFetcher {
     private final ExecutorService exec = Executors.newSingleThreadExecutor();
 
     public void fetch(
-            String city,
+            String location,
             DateFormat timeFormat,
             Calendar now,
             Consumer onReceived,
@@ -22,8 +22,9 @@ public class WeatherFetcher {
     ) {
         exec.execute(() -> {
             try {
-                var encodedCity = encode(city, "utf8");
-                var urlString = "https://wttr.in/" + encodedCity + "?format=j1";
+                var baseUrl = "https://wttr.in/";
+                var format = "?format=j1";
+                var urlString = baseUrl + (location != null ? encode(location, "utf8") : "") + format;
                 var url = new URL(urlString);
                 var connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
