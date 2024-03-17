@@ -8,9 +8,12 @@ import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.concurrent.*;
 import javax.net.ssl.SSLHandshakeException;
+import static java.net.HttpURLConnection.HTTP_OK;
 import static java.net.URLEncoder.encode;
 
 public class WeatherFetcher {
+    private final int ONE_SEC_IN_MS = 1_000;
+
     private final ExecutorService exec = Executors.newSingleThreadExecutor();
 
     public void fetch(
@@ -27,10 +30,11 @@ public class WeatherFetcher {
                 var urlString = baseUrl + (location != null ? encode(location, "utf8") : "") + format;
                 var url = new URL(urlString);
                 var connection = (HttpURLConnection) url.openConnection();
+                connection.setConnectTimeout(3 * ONE_SEC_IN_MS);
                 connection.setRequestMethod("GET");
 
                 var responseCode = connection.getResponseCode();
-                if (responseCode == HttpURLConnection.HTTP_OK) {
+                if (responseCode == HTTP_OK) {
                     var in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
                     var response = new StringBuilder();
                     String line;
@@ -50,10 +54,10 @@ public class WeatherFetcher {
                     throw new Exception("GET request not successful. Response code: " + responseCode);
                 }
             } catch (SSLHandshakeException e) {
-                Log.d(WeatherFetcher.class.getSimpleName(), "fetchWeatherData", e);
+                Log.d(WeatherFetcher.class.getSimpleName(), "fetch", e);
                 new Handler(Looper.getMainLooper()).post(() -> onError.accept(R.string.outdated_certificates, null));
             } catch (Exception e) {
-                Log.e(WeatherFetcher.class.getSimpleName(), "fetchWeatherData", e);
+                Log.e(WeatherFetcher.class.getSimpleName(), "fetch", e);
                 new Handler(Looper.getMainLooper()).post(() -> onError.accept(null, e.getLocalizedMessage()));
             }
         });

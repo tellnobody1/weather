@@ -87,6 +87,8 @@ public class MainActivity extends Activity {
             return false;
         if (networkOps.cellular(connectivityManager))
             return false;
+        if (timeOps.hoursBeforeNow(data.dateTime()) < 1)
+            return false;
         return true;
     }
 
