@@ -25,11 +25,11 @@ public record WeatherData(Calendar dateTime, List<Day> days, String areaName, St
             if (days.size() > 1) {
                 var tomorrow = days.get(1);
                 var hours = tomorrow.hours();
-                var noon = hours.get(hours.size() - 1);
+                var noon = hours.get(0);
                 uvIndexes.add(noon.uvIndex());
                 uvTimes.add(24);
             } else {
-                uvIndexes.add(uvIndexes.get(uvIndexes.size() - 1));
+                uvIndexes.add(0);
                 uvTimes.add(24);
             }
         }
