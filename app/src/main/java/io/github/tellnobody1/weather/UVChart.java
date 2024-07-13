@@ -11,6 +11,7 @@ import static android.graphics.Paint.ANTI_ALIAS_FLAG;
 import static android.graphics.Paint.Align.CENTER;
 import static android.graphics.Paint.Join.ROUND;
 import static android.graphics.Paint.Style.STROKE;
+import static java.lang.Math.*;
 
 public class UVChart extends View {
     public static final int ORANGE = Color.parseColor("#FFA500");
@@ -43,20 +44,22 @@ public class UVChart extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         if (init) {
-            drawNow(canvas);
+            var xIntervals = (int) ceil(log2(maxUvIndex)) + 1;
+            var xInterval = chartHeight() / xIntervals;
+            drawNow(canvas, xInterval);
             drawAxes(canvas);
-            drawAxesValues(canvas);
+            drawAxesValues(canvas, xIntervals, xInterval);
             drawTitle(canvas);
-            drawLine(canvas);
+            drawLine(canvas, xInterval);
         }
     }
 
-    private void drawLine(Canvas canvas) {
+    private void drawLine(Canvas canvas, float xInterval) {
         var color = paint.getColor();
         var strokeWidth = paint.getStrokeWidth();
         var style = paint.getStyle();
         paint.setStrokeWidth(width() / 120);
-        paint.setColor(switch (maxUvIndex - 1) {
+        paint.setColor(switch (maxUvIndex) {
             case 0, 1, 2 -> GREEN;
             case 3, 4, 5 -> YELLOW;
             case 6, 7 -> ORANGE;
@@ -67,14 +70,21 @@ public class UVChart extends View {
 
         path.reset();
         for (var i = 0; i < uvData.indexes().size(); i++) {
-            var index = uvData.indexes().get(i);
-            if (i == 0) {
-                path.moveTo(padding, chartHeight() - index * chartHeight() / maxUvIndex);
-            } else {
-                var x = padding + i * chartWidth() / (uvData.indexes().size() - 1);
-                var y = chartHeight() - index * chartHeight() / maxUvIndex;
-                path.lineTo(x, y);
+            var idx = uvData.indexes().get(i);
+            var x = padding + i * chartWidth() / (uvData.indexes().size() - 1);
+            var y = chartHeight();
+            if (idx != 0) {
+                var idxLog = log2(idx);
+                var idxLogFloor = (int) floor(idxLog);
+                var idxLogCeil = (int) ceil(idxLog);
+                var idxFloor = pow2(idxLogFloor);
+                var idxCeil = pow2(idxLogCeil);
+                y -= idxLogFloor * xInterval;
+                if (idxFloor != idxCeil)
+                    y -= xInterval * (idx - idxFloor) / (idxCeil - idxFloor);
             }
+            if (i == 0) path.moveTo(x, (int) y);
+            else path.lineTo(x, (int) y);
         }
         canvas.drawPath(path, paint);
 
@@ -83,7 +93,7 @@ public class UVChart extends View {
         paint.setStyle(style);
     }
 
-    private void drawNow(Canvas canvas) {
+    private void drawNow(Canvas canvas, float xInterval) {
         var effect = paint.getPathEffect();
         var alpha = paint.getAlpha();
         var interval = padding / 5;
@@ -91,8 +101,7 @@ public class UVChart extends View {
         paint.setAlpha(128);
 
         var x = padding + timeProgress * chartWidth();
-        var y = chartHeight() / maxUvIndex;
-        canvas.drawLine(x, y, x, chartHeight(), paint);
+        canvas.drawLine(x, xInterval, x, chartHeight(), paint);
 
         paint.setPathEffect(effect);
         paint.setAlpha(alpha);
@@ -103,12 +112,13 @@ public class UVChart extends View {
         canvas.drawLine(padding, chartHeight(), width(), chartHeight(), paint); // X-axis
     }
 
-    private void drawAxesValues(Canvas canvas) {
+    private void drawAxesValues(Canvas canvas, int xIntervals, float xInterval) {
         var fontMetrics = paint.getFontMetrics();
         // Y-axis values
-        for (var i = 0; i < maxUvIndex; i++) {
-            var value = String.valueOf(i);
-            var y = chartHeight() - (i * chartHeight() / maxUvIndex);
+        canvas.drawText("0", padding / 2, chartHeight() + fontMetrics.descent, paint);
+        for (var i = 1; i < xIntervals; i++) {
+            var value = String.valueOf(pow2(i));
+            var y = chartHeight() - i * xInterval;
             canvas.drawText(value, padding / 2, y + fontMetrics.descent, paint);
         }
         // X-axis values
@@ -132,7 +142,7 @@ public class UVChart extends View {
             this.init = false;
         } else {
             this.uvData = uvData;
-            this.maxUvIndex = Collections.max(uvData.indexes()) + 1;
+            this.maxUvIndex = Collections.max(uvData.indexes());
             this.timeProgress = timeProgress;
 
             paint.setTextSize(textSize);
@@ -143,5 +153,13 @@ public class UVChart extends View {
             this.init = true;
             invalidate();
         }
+    }
+
+    private static double log2(double x) {
+        return log(x) / log(2);
+    }
+
+    private static int pow2(int x) {
+        return (int) pow(2, x);
     }
 }
