@@ -1,17 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Погода</string>
-    <string name="updated">Оновлено %s</string>
-    <string name="now">зараз</string>
+    <string name="cancel">Скасувати</string>
     <string name="hour_0">нещодавно</string>
     <string name="hour_1">годину тому</string>
     <string name="hour_2">дві години тому</string>
     <string name="hour_3">більше 3-x годин тому</string>
+    <string name="location">Розташування</string>
+    <string name="no_internet">Немає інтернету</string>
+    <string name="now">зараз</string>
+    <string name="ok">Гаразд</string>
+    <string name="outdated_certificates">Сертіфікати застаріли</string>
+    <string name="refresh">Оновити</string>
+    <string name="sunset">Захід сонця о %s</string>
+    <string name="temp_forecast">Прогноз температури</string>
     <string name="temperature">Відчувається як %d° (%d°–%d°)</string>
+    <string name="updated">Оновлено %s</string>
+    <string name="uv_index">Ультрафіолетовий індекс</string>
     <string name="wind">Вітер: %s</string>
-    <string name="wind_gust">Пориви: %s</string>
     <string name="wind_0">Штиль (0)</string>
     <string name="wind_1">Легкий вітерець (1)</string>
+    <string name="wind_10">Буря (10)</string>
+    <string name="wind_11">Сильна буря (11)</string>
+    <string name="wind_12">Сила урагану (12)</string>
     <string name="wind_2">Легкий бриз (2)</string>
     <string name="wind_3">М\'який бриз (3)</string>
     <string name="wind_4">Помірний бриз (4)</string>
@@ -20,15 +31,5 @@
     <string name="wind_7">Сильний вітер (7)</string>
     <string name="wind_8">Шторм (8)</string>
     <string name="wind_9">Сильний шторм (9)</string>
-    <string name="wind_10">Буря (10)</string>
-    <string name="wind_11">Сильна буря (11)</string>
-    <string name="wind_12">Сила урагану (12)</string>
-    <string name="uv_index">Ультрафіолетовий індекс</string>
-    <string name="sunset">Захід сонця о %s</string>
-    <string name="refresh">Оновити</string>
-    <string name="location">Розташування</string>
-    <string name="ok">Гаразд</string>
-    <string name="cancel">Скасувати</string>
-    <string name="outdated_certificates">Сертіфікати застаріли</string>
-    <string name="no_internet">Немає інтернету</string>
+    <string name="wind_gust">Пориви: %s</string>
 </resources>

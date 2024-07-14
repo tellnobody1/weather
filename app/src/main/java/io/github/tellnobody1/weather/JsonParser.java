@@ -40,7 +40,18 @@ public class JsonParser {
                 days.add(day);
             }
 
-            weatherData = new WeatherData(now, days, areaName, json);
+            var tempForecast = new TempForecast(new LinkedList<>());
+            for (var i = 0; i < weatherArray.length(); i++) {
+                var dayObject = weatherArray.getJSONObject(i);
+                var hourlyArray = dayObject.getJSONArray("hourly");
+                for (var j = 0; j < hourlyArray.length(); j++) {
+                    var hourObject = hourlyArray.getJSONObject(j);
+                    var feelsLikeC = Integer.parseInt(hourObject.getString("FeelsLikeC"));
+                    tempForecast.values().add(feelsLikeC);
+                }
+            }
+
+            weatherData = new WeatherData(now, days, tempForecast, areaName, json);
         } catch (Exception e) {
             Log.d(JsonParser.class.getSimpleName(), "JSON=" + json);
             Log.e(JsonParser.class.getSimpleName(), "parseWeatherData", e);

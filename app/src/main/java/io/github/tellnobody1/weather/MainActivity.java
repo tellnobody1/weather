@@ -5,6 +5,8 @@ import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.view.*;
 import android.widget.*;
+import java.text.*;
+import java.util.Locale;
 import static android.os.Build.VERSION.SDK_INT;
 import static android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH;
 import static android.view.View.*;
@@ -126,6 +128,7 @@ public class MainActivity extends Activity {
         setTodayWeather(data);
         setSunset(data);
         setUVChart(data);
+        setTempForecast(data.tempForecast());
     }
 
     private void setTime(WeatherData data, boolean now) {
@@ -187,9 +190,27 @@ public class MainActivity extends Activity {
     }
 
     private void setUVChart(WeatherData data) {
-        TextView textView = findViewById(R.id.dateTime);
+        var textView = this.<TextView>findViewById(R.id.dateTime);
         var textSize = textView.getTextSize();
         var textColor = textView.getCurrentTextColor();
         this.<UVChart>findViewById(R.id.uvChart).init(data.uvData(), textSize, textColor, timeOps.timeProgress());
+    }
+
+    private void setTempForecast(TempForecast tempForecast) {
+        var textView = this.<TextView>findViewById(R.id.dateTime);
+        var textSize = textView.getTextSize();
+        var textColor = textView.getCurrentTextColor();
+        this.<TempChart>findViewById(R.id.tempChart).init(tempForecast, textSize, textColor);
+    }
+
+    private String dateToDayOfWeek(String date) {
+        var inputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        SimpleDateFormat outputFormat = new SimpleDateFormat("EEEE", Locale.getDefault());
+        try {
+            return outputFormat.format(inputFormat.parse(date));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return date;
+        }
     }
 }
